@@ -11,21 +11,27 @@ class Leg {
     return `Leg ${this.legNumber}: ${this.from.name} to ${this.to.name}, Target Alt: ${this.targetAltitude} ft`;
   }
 
+  toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+  }
+
+  toNmi(km) {
+    return km * 0.539957;
+  }
+
   greatCircleDistance() {
-    const R = 6371; // Earth's radius in kilometers
+    const distance =
+      Math.acos(
+        Math.sin(this.toRadians(this.from.lat)) *
+          Math.sin(this.toRadians(this.to.lat)) +
+          Math.cos(this.toRadians(this.from.lat)) *
+            Math.cos(this.toRadians(this.to.lat)) *
+            Math.cos(
+              this.toRadians(this.to.lon) - this.toRadians(this.from.lon)
+            )
+      ) * 6371;
 
-    const deltaLat = this.endLat - this.startLat;
-    const deltaLon = this.endLon - this.startLon;
-
-    const a =
-      Math.sin(deltaLat / 2) ** 2 +
-      Math.cos(this.startLat) *
-        Math.cos(this.endLat) *
-        Math.sin(deltaLon / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    const distance = R * c;
-    return distance;
+    return this.toNmi(distance);
   }
 }
 
@@ -52,39 +58,3 @@ function getLegsFromSheet(waypoints) {
 
   return legs;
 }
-
-class Leg {
-  constructor(startLat, startLon, endLat, endLon) {
-    this.startLat = this.toRadians(startLat);
-    this.startLon = this.toRadians(startLon);
-    this.endLat = this.toRadians(endLat);
-    this.endLon = this.toRadians(endLon);
-  }
-
-  toRadians(degrees) {
-    return degrees * (Math.PI / 180);
-  }
-
-  greatCircleDistance() {
-    const R = 6371; // Earth's radius in kilometers
-
-    const deltaLat = this.endLat - this.startLat;
-    const deltaLon = this.endLon - this.startLon;
-
-    const a =
-      Math.sin(deltaLat / 2) ** 2 +
-      Math.cos(this.startLat) *
-        Math.cos(this.endLat) *
-        Math.sin(deltaLon / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    const distance = R * c;
-    return distance;
-  }
-}
-
-// Example usage
-const leg = new Leg(48.8566, 2.3522, 40.7128, -74.006); // Paris to New York
-console.log(
-  `Great-circle distance: ${leg.greatCircleDistance().toFixed(2)} km`
-);
