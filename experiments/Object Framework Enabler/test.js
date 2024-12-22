@@ -10,4 +10,7 @@ function testLegCreation() {
   Logger.log(`Created ${Object.keys(waypoints).length} waypoints.`);
   const legs = getLegsFromSheet(waypoints);
   Logger.log(`Created ${legs.length} legs.`);
+  Logger.log(
+    `Great-circle distance: ${leg[1].greatCircleDistance().toFixed(2)} km`
+  );
 }
