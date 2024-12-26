@@ -1,4 +1,3 @@
-// Leg Class Definition
 class Leg {
   constructor(legNumber, from, to, targetAltitude) {
     this.legNumber = legNumber;
@@ -33,28 +32,4 @@ class Leg {
 
     return this.toNmi(distance);
   }
-}
-
-// Pull Data from Google Sheet and Create Legs
-function getLegsFromSheet(waypoints) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
-  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getValues();
-
-  let legs = [];
-  data.forEach((row) => {
-    const [legNumber, fromName, toName, targetAltitude] = row;
-    const fromWaypoint = waypoints[fromName.trim().toUpperCase()];
-    const toWaypoint = waypoints[toName.trim().toUpperCase()];
-
-    if (fromWaypoint && toWaypoint) {
-      let leg = new Leg(legNumber, fromWaypoint, toWaypoint, targetAltitude);
-      legs[leg.legNumber] = leg;
-    } else {
-      Logger.log(
-        `Waypoint not found for Leg ${legNumber}: ${fromName} to ${toName}`
-      );
-    }
-  });
-
-  return legs;
 }
