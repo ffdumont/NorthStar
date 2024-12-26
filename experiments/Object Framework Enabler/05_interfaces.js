@@ -9,7 +9,7 @@ function processRouteData() {
   const route = new Route();
   route.getWaypointsFromSheet();
   route.getLegsFromSheet();
-  calculateDistances(route);
+  pushLegResults(route, "Distance");
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "Route data processed and distances updated!",
     "Success",

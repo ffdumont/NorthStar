@@ -22,5 +22,5 @@ function testRoute2() {
   route.getWaypointsFromSheet();
   route.getLegsFromSheet();
   Logger.log("Route Data: " + JSON.stringify(route));
-  calculateDistances();
+  pushLegResults(route, "Distance");
 }
