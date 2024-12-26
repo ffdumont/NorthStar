@@ -1,8 +1,7 @@
 function pushLegResults(route, columnName) {
   const methodMapping = {
     Distance: "greatCircleDistance",
-    // Future expansion for bearing calculation
-    // 'True Track': 'calculateBearing'
+    TrueTrack: "bearing",
   };
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
@@ -25,7 +24,7 @@ function pushLegResults(route, columnName) {
 
   if (colIndex === 0) {
     sheet.getRange(1, sheet.getLastColumn() + 1).setValue(columnName);
-    colIndex = sheet.getLastColumn() + 1;
+    colIndex = sheet.getLastColumn();
   }
 
   const columnResults = [];

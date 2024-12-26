@@ -10,6 +10,7 @@ function processRouteData() {
   route.getWaypointsFromSheet();
   route.getLegsFromSheet();
   pushLegResults(route, "Distance");
+  pushLegResults(route, "TrueTrack");
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "Route data processed and distances updated!",
     "Success",
