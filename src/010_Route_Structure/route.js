@@ -52,6 +52,7 @@ class Route {
           targetAltitude
         );
         legs[leg.legNumber] = leg;
+        Logger.log(`Leg ${legNumber}: from ${fromName} (${fromWaypoint}) to ${toName} (${toWaypoint}) with target altitude ${targetAltitude}`);
       } else {
         Logger.log(
           `Waypoint not found for Leg ${legNumber}: ${fromName} to ${toName}`
@@ -60,5 +61,6 @@ class Route {
     });
 
     this.legs = legs;
+    Logger.log("Legs have been successfully loaded.");
   }
 }
