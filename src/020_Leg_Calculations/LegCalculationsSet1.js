@@ -27,8 +27,8 @@ Leg.prototype.greatCircleDistance = function () {
   return this.toNmi(distance);
 };
 
-Leg.prototype.bearing = function () {
-  const bearing = this.toDegrees(
+Leg.prototype.trueTrack = function () {
+  const trueTrack = this.toDegrees(
     Math.atan2(
       Math.sin(this.toRadians(this.to.lon - this.from.lon)) *
         Math.cos(this.toRadians(this.to.lat)),
@@ -40,5 +40,27 @@ Leg.prototype.bearing = function () {
     )
   );
 
-  return bearing < 0 ? bearing + 360 : bearing;
+  return trueTrack < 0 ? trueTrack + 360 : trueTrack;
+};
+
+Leg.prototype.magneticTrack = function (magneticDeclination) {
+  const trueTrack = this.trueTrack();
+  const magneticTrack = trueTrack - magneticDeclination;
+  return magneticTrack < 0 ? magneticTrack + 360 : magneticTrack;
+};
+
+Leg.prototype.calculateMidpoint = function () {
+  const midLat = (this.from.lat + this.to.lat) / 2;
+  const midLon = (this.from.lon + this.to.lon) / 2;
+  return { lat: midLat, lon: midLon };
+};
+
+Leg.prototype.declination = function () {
+  const midpoint = this.calculateMidpoint();
+  return fetchNoaaGeomagData(midpoint.lat, midpoint.lon, "declination");
+};
+
+Leg.prototype.elevation = function () {
+  const midpoint = this.calculateMidpoint();
+  return fetchIgnGeopfData(midpoint.lat, midpoint.lon);
 };

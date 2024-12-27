@@ -1,4 +1,4 @@
-function testRoute1() {
+function testRouteCreation() {
   route = new Route();
   route.waypoints = {
     POINTA: new Waypoint("POINTA", 40.7128, -74.006),
@@ -15,13 +15,4 @@ function testRoute1() {
   Logger.log("Testing Route:");
   Logger.log(route.legs[1].toString());
   Logger.log("Distance (NMI): " + route.legs[1].greatCircleDistance());
-}
-
-function testRoute2() {
-  route = new Route();
-  route.getWaypointsFromSheet();
-  route.getLegsFromSheet();
-  Logger.log("Route Data: " + JSON.stringify(route));
-  Logger.log("Bearing: " + route.legs[1].bearing());
-  pushLegResults(route, "Distance");
 }

@@ -1,7 +1,7 @@
 function pushLegResults(route, columnName) {
   const methodMapping = {
     Distance: "greatCircleDistance",
-    TrueTrack: "bearing",
+    TrueTrack: "trueTrack",
   };
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");

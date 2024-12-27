@@ -1,0 +1,1 @@
+../tests/020_testDeclination.js
