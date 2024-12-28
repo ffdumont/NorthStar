@@ -9,8 +9,10 @@ function processRouteData() {
   const route = new Route();
   route.getWaypointsFromSheet();
   route.getLegsFromSheet();
-  pushLegResults(route, "Distance");
-  pushLegResults(route, "TrueTrack");
+  pushLegResults(route, "distance");
+  pushLegResults(route, "trueTrack");
+  pushLegResults(route, "magneticTrack");
+  pushLegResults(route, "minimalSecurityAltitude");
   SpreadsheetApp.getActiveSpreadsheet().toast(
     "Route data processed and distances updated!",
     "Success",

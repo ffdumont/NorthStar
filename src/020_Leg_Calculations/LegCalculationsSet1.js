@@ -43,10 +43,11 @@ Leg.prototype.trueTrack = function () {
   return trueTrack < 0 ? trueTrack + 360 : trueTrack;
 };
 
-Leg.prototype.magneticTrack = function (magneticDeclination) {
+Leg.prototype.magneticTrack = function () {
+  const magneticDeclination = this.magneticDeclination();
   const trueTrack = this.trueTrack();
   const magneticTrack = trueTrack - magneticDeclination;
-  return magneticTrack < 0 ? magneticTrack + 360 : magneticTrack;
+  return (magneticTrack + 360) % 360;
 };
 
 Leg.prototype.calculateMidpoint = function () {
@@ -55,7 +56,7 @@ Leg.prototype.calculateMidpoint = function () {
   return { lat: midLat, lon: midLon };
 };
 
-Leg.prototype.declination = function () {
+Leg.prototype.magneticDeclination = function () {
   const midpoint = this.calculateMidpoint();
   return fetchNoaaGeomagData(midpoint.lat, midpoint.lon, "declination");
 };
@@ -63,4 +64,8 @@ Leg.prototype.declination = function () {
 Leg.prototype.elevation = function () {
   const midpoint = this.calculateMidpoint();
   return fetchIgnGeopfData(midpoint.lat, midpoint.lon);
+};
+
+Leg.prototype.minimalSecurityAltitude = function () {
+  return this.elevation() + 1000;
 };

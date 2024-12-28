@@ -1,7 +1,9 @@
 function pushLegResults(route, columnName) {
   const methodMapping = {
-    Distance: "greatCircleDistance",
-    TrueTrack: "trueTrack",
+    distance: "greatCircleDistance",
+    trueTrack: "trueTrack",
+    magneticTrack: "magneticTrack",
+    minimalSecurityAltitude: "minimalSecurityAltitude",
   };
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
