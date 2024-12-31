@@ -1,0 +1,23 @@
+SET 1
+Distance
+True Track
+Magnetic Track
+Magnetic Declination
+Surface Altitude
+Minimal Security Altitude
+
+SET 2
+Pressure Altitude
+Density Altitude
+ISA Deviation
+
+SET 3
+Drift
+Magnetic Heading
+Magnetic Track
+
+
+SET 4
+Ground Speed
+Leg Time w/o Wind
+Leg Time w/ Wind
