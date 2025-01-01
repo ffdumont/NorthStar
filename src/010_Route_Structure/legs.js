@@ -4,5 +4,6 @@ class Leg {
     this.from = from;
     this.to = to;
     this.targetAltitude = targetAltitude;
+    this._pressure_msl = null; // Internal, private by convention
   }
 }

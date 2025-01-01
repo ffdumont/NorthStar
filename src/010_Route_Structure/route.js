@@ -29,7 +29,7 @@ class Route {
     this.waypoints = waypoints;
   }
 
-  getLegsFromSheet() {
+  async getLegsFromSheet() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
     if (!sheet) {
       Logger.log("Sheet 'Legs' not found.");
@@ -39,7 +39,7 @@ class Route {
 
     const legs = {};
 
-    data.forEach((row) => {
+    for (const row of data) {
       const [legNumber, fromName, toName, targetAltitude] = row;
       const fromWaypoint = this.waypoints[fromName.trim().toUpperCase()];
       const toWaypoint = this.waypoints[toName.trim().toUpperCase()];
@@ -52,15 +52,30 @@ class Route {
           targetAltitude
         );
         legs[leg.legNumber] = leg;
-        Logger.log(`Leg ${legNumber}: from ${fromName} (${fromWaypoint}) to ${toName} (${toWaypoint}) with target altitude ${targetAltitude}`);
+
+        // Asynchronously fetch weather variables during leg initialization
+        try {
+          Logger.log(`Fetching weather for Leg ${legNumber}...`);
+          await Promise.all([
+            leg.fetchWeatherVariable("pressure_msl"),
+            leg.fetchWeatherVariable("temperature_2m"),
+          ]);
+          Logger.log(
+            `Leg ${legNumber} initialized with pressure_msl: ${leg._weather_pressure_msl}, temperature_2m: ${leg._weather_temperature_2m}`
+          );
+        } catch (error) {
+          Logger.log(
+            `Failed to fetch weather data for Leg ${legNumber}: ${error.message}`
+          );
+        }
       } else {
         Logger.log(
           `Waypoint not found for Leg ${legNumber}: ${fromName} to ${toName}`
         );
       }
-    });
+    }
 
     this.legs = legs;
-    Logger.log("Legs have been successfully loaded.");
+    Logger.log("Legs have been successfully loaded with weather data.");
   }
 }
