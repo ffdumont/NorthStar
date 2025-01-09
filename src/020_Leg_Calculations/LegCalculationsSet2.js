@@ -39,3 +39,10 @@ Leg.prototype.resetAllWeatherVariables = function () {
     }
   }
 };
+
+Leg.prototype.temperature_2m = function () {
+  return this._weather_temperature_2m;
+};
+Leg.prototype.pressure_msl = function () {
+  return this._weather_pressure_msl;
+};

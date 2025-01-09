@@ -4,6 +4,8 @@ function pushLegResults(route, columnName) {
     trueTrack: "trueTrack",
     magneticTrack: "magneticTrack",
     minimalSecurityAltitude: "minimalSecurityAltitude",
+    temperature_2m: "temperature_2m",
+    pressure_msl: "pressure_msl",
   };
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");

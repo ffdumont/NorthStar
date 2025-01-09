@@ -12,4 +12,4 @@ mklink .\deploy\920_testDeclination.js ..\tests\020_testDeclination.js
 mklink .\deploy\920_testElevation.js ..\tests\020_testElevation.js
 mklink .\deploy\930_testPushLegResults.js ..\tests\030_testPushLegResults.js
 mklink .\deploy\920_testWeatherVariables.js ..\tests\020_testWeatherVariables.js
-mklink .\deploy\042_fetchWeatherData.js ..\src\040_Services\fetchWeatherData.js
+mklink .\deploy\942_testFetchRouteWeatherData.js ..\tests\040_testFetchRouteWeatherData.js

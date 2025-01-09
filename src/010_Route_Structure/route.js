@@ -29,7 +29,7 @@ class Route {
     this.waypoints = waypoints;
   }
 
-  async getLegsFromSheet() {
+  getLegsFromSheet() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
     if (!sheet) {
       Logger.log("Sheet 'Legs' not found.");
@@ -52,30 +52,67 @@ class Route {
           targetAltitude
         );
         legs[leg.legNumber] = leg;
-
-        // Asynchronously fetch weather variables during leg initialization
-        try {
-          Logger.log(`Fetching weather for Leg ${legNumber}...`);
-          await Promise.all([
-            leg.fetchWeatherVariable("pressure_msl"),
-            leg.fetchWeatherVariable("temperature_2m"),
-          ]);
-          Logger.log(
-            `Leg ${legNumber} initialized with pressure_msl: ${leg._weather_pressure_msl}, temperature_2m: ${leg._weather_temperature_2m}`
-          );
-        } catch (error) {
-          Logger.log(
-            `Failed to fetch weather data for Leg ${legNumber}: ${error.message}`
-          );
-        }
       } else {
         Logger.log(
           `Waypoint not found for Leg ${legNumber}: ${fromName} to ${toName}`
         );
       }
     }
-
     this.legs = legs;
-    Logger.log("Legs have been successfully loaded with weather data.");
+    Logger.log("Legs have been successfully loaded.");
+  }
+
+  async fetchRouteWeatherData() {
+    const legs = this.legs;
+
+    for (const legNumber in legs) {
+      const leg = legs[legNumber];
+      try {
+        Logger.log(`Fetching weather for Leg ${legNumber}...`);
+        await Promise.all([
+          leg.fetchWeatherVariable("pressure_msl"),
+          leg.fetchWeatherVariable("temperature_2m"),
+        ]);
+        Logger.log(
+          `Leg ${legNumber} initialized with pressure_msl: ${leg._weather_pressure_msl}, temperature_2m: ${leg._weather_temperature_2m}`
+        );
+      } catch (error) {
+        Logger.log(
+          `Failed to fetch weather data for Leg ${legNumber}: ${error.message}`
+        );
+      }
+    }
+    Logger.log("Weather data fetch completed for all legs.");
+  }
+
+  saveToCache() {
+    const cache = CacheService.getScriptCache();
+    cache.put("route", JSON.stringify(this), 21600); // Cache for 6 hours
+    Logger.log("Route saved to cache.");
+  }
+
+  static loadFromCache() {
+    const cache = CacheService.getScriptCache();
+    const data = cache.get("route");
+
+    if (data) {
+      Logger.log("Route retrieved from cache.");
+      const parsedData = JSON.parse(data);
+      const route = Object.assign(new Route(), parsedData);
+
+      // Convert legs from object to array if necessary
+      if (parsedData.legs && typeof parsedData.legs === "object") {
+        route.legs = Object.values(parsedData.legs).map((legData) =>
+          Object.assign(new Leg(), legData)
+        );
+      } else {
+        route.legs = [];
+      }
+
+      return route;
+    } else {
+      Logger.log("No route found in cache.");
+      return null;
+    }
   }
 }

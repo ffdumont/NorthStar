@@ -5,17 +5,14 @@ Leg.prototype.toString = function () {
 };
 
 Leg.prototype.toRadians = function (degrees) {
-  console.log(`Converting ${degrees} degrees to radians.`);
   return (degrees * Math.PI) / 180;
 };
 
 Leg.prototype.toDegrees = function (radians) {
-  console.log(`Converting ${radians} radians to degrees.`);
   return (radians * 180) / Math.PI;
 };
 
 Leg.prototype.toNmi = function (km) {
-  console.log(`Converting ${km} km to nautical miles.`);
   return km * 0.539957;
 };
 
