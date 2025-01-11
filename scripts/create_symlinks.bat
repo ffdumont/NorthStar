@@ -4,6 +4,7 @@ mklink .\deploy\012_route.js ..\src\010_Route_Structure\route.js
 mklink .\deploy\021_legCalculationsSet1.js ..\src\020_Leg_Calculations\legCalculationsSet1.js
 mklink .\deploy\021_legCalculationsSet2.js ..\src\020_Leg_Calculations\legCalculationsSet2.js
 mklink .\deploy\031_interfaces.js ..\src\030_Interfaces\interfaces.js
+mklink .\deploy\033_services.js ..\src\030_Interfaces\services.js
 mklink .\deploy\032_pushLegResults.js ..\src\030_Interfaces\pushLegResults.js
 mklink .\deploy\041_noaaGeomag.js ..\src\040_Services\noaaGeomag.js
 mklink .\deploy\041_ignGeopf.js ..\src\040_Services\ignGeopf.js
@@ -13,3 +14,4 @@ mklink .\deploy\920_testElevation.js ..\tests\020_testElevation.js
 mklink .\deploy\930_testPushLegResults.js ..\tests\030_testPushLegResults.js
 mklink .\deploy\920_testWeatherVariables.js ..\tests\020_testWeatherVariables.js
 mklink .\deploy\942_testFetchRouteWeatherData.js ..\tests\040_testFetchRouteWeatherData.js
+

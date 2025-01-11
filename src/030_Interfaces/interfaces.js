@@ -22,14 +22,6 @@ function processRouteData() {
   );
 }
 
-function onOpen() {
-  var ui = SpreadsheetApp.getUi();
-  ui.createMenu("NorthStar")
-    .addItem("Process Route Data", "processRouteData")
-    .addItem("Fetch Weather Data", "fetchWeatherData")
-    .addToUi();
-}
-
 function processRouteData() {
   const route = new Route();
   route.getWaypointsFromSheet();
@@ -55,25 +47,17 @@ function processWeatherData() {
       Logger.log(
         "Route successfully loaded from cache. Starting weather fetch..."
       );
-      route
-        .fetchRouteWeatherData()
-        .then(() => {
-          Logger.log("Weather data fetched, saving to cache...");
-          route.saveToCache();
-          SpreadsheetApp.getActiveSpreadsheet().toast(
-            "Weather data fetched and applied!",
-            "Success",
-            3
-          );
-        })
-        .catch((error) => {
-          Logger.log("Error during weather data fetch: " + error.message);
-          SpreadsheetApp.getActiveSpreadsheet().toast(
-            "Failed to fetch weather data.",
-            "Error",
-            3
-          );
-        });
+
+      // Directly call fetchRouteWeatherData() synchronously
+      route.fetchRouteWeatherData();
+
+      Logger.log("Weather data fetched, saving to cache...");
+      route.saveToCache();
+      SpreadsheetApp.getActiveSpreadsheet().toast(
+        "Weather data fetched and applied!",
+        "Success",
+        3
+      );
     } else {
       Logger.log("Failed to load route from cache. No route found.");
       SpreadsheetApp.getActiveSpreadsheet().toast(

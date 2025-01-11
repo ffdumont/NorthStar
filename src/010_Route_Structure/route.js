@@ -62,20 +62,15 @@ class Route {
     Logger.log("Legs have been successfully loaded.");
   }
 
-  async fetchRouteWeatherData() {
+  fetchRouteWeatherData() {
     const legs = this.legs;
+    const weatherVariables = ["temperature_2m", "pressure_msl"];
 
     for (const legNumber in legs) {
       const leg = legs[legNumber];
       try {
-        Logger.log(`Fetching weather for Leg ${legNumber}...`);
-        await Promise.all([
-          leg.fetchWeatherVariable("pressure_msl"),
-          leg.fetchWeatherVariable("temperature_2m"),
-        ]);
-        Logger.log(
-          `Leg ${legNumber} initialized with pressure_msl: ${leg._weather_pressure_msl}, temperature_2m: ${leg._weather_temperature_2m}`
-        );
+        Logger.log(`Fetching weather data for Leg ${legNumber}...`);
+        leg.fetchLegWeatherData(weatherVariables);
       } catch (error) {
         Logger.log(
           `Failed to fetch weather data for Leg ${legNumber}: ${error.message}`
@@ -83,6 +78,7 @@ class Route {
       }
     }
     Logger.log("Weather data fetch completed for all legs.");
+    weatherVariables.forEach((variable) => pushLegResults(this, variable));
   }
 
   saveToCache() {
@@ -98,15 +94,24 @@ class Route {
     if (data) {
       Logger.log("Route retrieved from cache.");
       const parsedData = JSON.parse(data);
+
+      // Recreate the Route object
       const route = Object.assign(new Route(), parsedData);
 
-      // Convert legs from object to array if necessary
-      if (parsedData.legs && typeof parsedData.legs === "object") {
-        route.legs = Object.values(parsedData.legs).map((legData) =>
-          Object.assign(new Leg(), legData)
+      // Recreate legs as instances of Leg
+      for (const legNumber in parsedData.legs) {
+        route.legs[legNumber] = Object.assign(
+          new Leg(),
+          parsedData.legs[legNumber]
         );
-      } else {
-        route.legs = [];
+      }
+
+      // Recreate waypoints as instances of Waypoint
+      for (const waypointName in parsedData.waypoints) {
+        route.waypoints[waypointName] = Object.assign(
+          new Waypoint(),
+          parsedData.waypoints[waypointName]
+        );
       }
 
       return route;

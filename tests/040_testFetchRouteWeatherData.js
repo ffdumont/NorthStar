@@ -1,4 +1,4 @@
-function testFetchRouteWeatherData() {
+function testFetchRouteWeatherData1() {
   route = new Route();
   route.getWaypointsFromSheet();
   route.getLegsFromSheet();
@@ -33,11 +33,11 @@ function testFetchRouteWeatherData() {
           weatherVariables.forEach((variable) => {
             const cacheKey = `_weather_${variable}`;
 
-            if (leg[cacheKey] !== undefined) {
+            if (leg[cacheKey] != null) {
               Logger.log(
                 `${variable} already cached for Leg ${legNumber}: ${leg[cacheKey]}`
               );
-              return; // Skip if already cached
+              return; // Skip if valid data is already cached
             }
 
             try {
@@ -53,8 +53,9 @@ function testFetchRouteWeatherData() {
               );
             }
           });
-          pushLegResults(loadedRoute, "pressure_msl");
-          pushLegResults(loadedRoute, "temperature_2m");
+          weatherVariables.forEach((variable) =>
+            pushLegResults(loadedRoute, variable)
+          );
         } catch (error) {
           Logger.log(
             `Failed to fetch weather data for Leg ${legNumber}: ${error.message}`
@@ -78,4 +79,15 @@ function testFetchRouteWeatherData() {
       3
     );
   }
+}
+
+function testFetchRouteWeatherData2() {
+  route = new Route();
+  route.getWaypointsFromSheet();
+  route.getLegsFromSheet();
+
+  Logger.log("Route Data: " + JSON.stringify(route));
+
+  route.saveToCache(); // Cache route object after full creation
+  processWeatherData();
 }

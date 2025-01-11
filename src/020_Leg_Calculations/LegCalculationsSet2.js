@@ -1,48 +1,40 @@
-Leg.prototype.fetchWeatherVariable = async function (variable) {
-  const midpoint = this.calculateMidpoint();
-  const today = new Date();
-  today.setHours(12, 0, 0, 0); // Set time to 12:00 PM
-  const dateString = today.toISOString().slice(0, 19) + "Z"; // Format date as ISO string
-
-  // Cache key based on variable name (to store different variables separately)
-  const cacheKey = `_weather_${variable}`;
-
-  if (this[cacheKey] !== undefined) {
-    return this[cacheKey];
-  }
-
-  try {
-    console.log(`Fetching ${variable} data...`);
-    const data = await fetchWeatherData(midpoint.lat, midpoint.lon);
-    this[cacheKey] = getWeatherVariable(data, dateString, variable);
-    console.log(`${variable} fetched and cached:`, this[cacheKey]);
-    return this[cacheKey];
-  } catch (error) {
-    console.error(`Error fetching ${variable}:`, error.message);
-    throw error;
-  }
-};
-
-// Reset specific variable cache
-Leg.prototype.resetWeatherVariable = function (variable) {
-  const cacheKey = `_weather_${variable}`;
-  console.log(`${variable} cache invalidated.`);
-  this[cacheKey] = undefined;
-};
-
-// Reset all weather variables
-Leg.prototype.resetAllWeatherVariables = function () {
-  for (const key in this) {
-    if (key.startsWith("_weather_")) {
-      console.log(`Invalidating cache for ${key}`);
-      this[key] = undefined;
-    }
-  }
-};
-
 Leg.prototype.temperature_2m = function () {
   return this._weather_temperature_2m;
 };
 Leg.prototype.pressure_msl = function () {
   return this._weather_pressure_msl;
+};
+
+Leg.prototype.fetchLegWeatherData = function (weatherVariables) {
+  const midpoint = this.calculateMidpoint();
+  const data = fetchWeatherData(midpoint.lat, midpoint.lon);
+  //  const today = new Date();
+  //  today.setHours(12, 0, 0, 0); // Set time to 12:00 PM
+  //  const dateString = today.toISOString().slice(0, 19) + "Z"; // Format date as ISO string
+  const dateString = convertDateToISO8601(
+    roundToClosestHour(getNamedRangeValue("offBlockDateTime"))
+  );
+
+  weatherVariables.forEach((variable) => {
+    const cacheKey = `_weather_${variable}`;
+
+    if (this[cacheKey] != null) {
+      Logger.log(
+        `${variable} already cached for Leg ${this.legNumber}: ${this[cacheKey]}`
+      );
+      return; // Skip if valid data is already cached
+    }
+
+    try {
+      Logger.log(`Fetching ${variable} for Leg ${this.legNumber}...`);
+      this[cacheKey] = getWeatherVariable(data, dateString, variable);
+      Logger.log(
+        `${variable} fetched and cached for Leg ${this.legNumber}: ${this[cacheKey]}`
+      );
+    } catch (error) {
+      Logger.log(
+        `Error fetching ${variable} for Leg ${this.legNumber}: ${error.message}`
+      );
+    }
+  });
 };
