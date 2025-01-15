@@ -8,6 +8,12 @@ function pushLegResults(route, columnName) {
     pressure_msl: "pressure_msl",
   };
 
+  pressureTable.forEach(({ pressure }) => {
+    const suffix = `${pressure}hPa`;
+    methodMapping[`wind_direction_${suffix}`] = `wind_direction_${suffix}`;
+    methodMapping[`wind_speed_${suffix}`] = `wind_speed_${suffix}`;
+  });
+
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
   if (!sheet) {
     Logger.log("Sheet 'Legs' not found.");

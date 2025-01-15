@@ -1,3 +1,35 @@
+const pressureTable = [
+  { pressure: 1000, height: 110 },
+  { pressure: 950, height: 500 },
+  { pressure: 925, height: 800 },
+  { pressure: 900, height: 1000 },
+  { pressure: 850, height: 1500 },
+  { pressure: 800, height: 1900 },
+  { pressure: 750, height: 2500 },
+  { pressure: 700, height: 3000 },
+  { pressure: 650, height: 3600 },
+  { pressure: 600, height: 4200 },
+  { pressure: 550, height: 4900 },
+  { pressure: 500, height: 5600 },
+  { pressure: 450, height: 6300 },
+  { pressure: 400, height: 7200 },
+  { pressure: 350, height: 8100 },
+  { pressure: 300, height: 9200 },
+  { pressure: 275, height: 9700 },
+  { pressure: 250, height: 10400 },
+  { pressure: 225, height: 11000 },
+  { pressure: 200, height: 11800 },
+  { pressure: 175, height: 12600 },
+  { pressure: 150, height: 13500 },
+  { pressure: 125, height: 14600 },
+  { pressure: 100, height: 15800 },
+  { pressure: 70, height: 17700 },
+  { pressure: 50, height: 19300 },
+  { pressure: 30, height: 22000 },
+  { pressure: 20, height: 23000 },
+  { pressure: 10, height: 26000 },
+];
+
 class Route {
   constructor() {
     this.waypoints = {};
@@ -66,10 +98,35 @@ class Route {
     const legs = this.legs;
     const weatherVariables = ["temperature_2m", "pressure_msl"];
 
+    // Function to get the closest pressure level based on height
+    const getPressureLevel = (height) => {
+      let closest = pressureTable[0];
+      for (const entry of pressureTable) {
+        if (
+          Math.abs(entry.height - height) < Math.abs(closest.height - height)
+        ) {
+          closest = entry;
+        }
+      }
+      return closest.pressure;
+    };
+
     for (const legNumber in legs) {
       const leg = legs[legNumber];
       try {
         Logger.log(`Fetching weather data for Leg ${legNumber}...`);
+        // Calculate height difference
+        const height = leg.targetAltitude - (leg.elevation() || 0);
+
+        // Determine pressure level
+        const pressureLevel = getPressureLevel(height);
+
+        // Add wind variables based on pressure level
+        const windSpeedVar = `wind_speed_${pressureLevel}hPa`;
+        const windDirectionVar = `wind_direction_${pressureLevel}hPa`;
+
+        weatherVariables.push(windSpeedVar, windDirectionVar);
+
         leg.fetchLegWeatherData(weatherVariables);
       } catch (error) {
         Logger.log(

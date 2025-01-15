@@ -1,18 +1,34 @@
-Leg.prototype.temperature_2m = function () {
-  return this._weather_temperature_2m;
-};
-Leg.prototype.pressure_msl = function () {
-  return this._weather_pressure_msl;
-};
+const weatherProperties = ["temperature_2m", "pressure_msl"];
+
+weatherProperties.forEach((property) => {
+  const privateProperty = `_weather_${property}`;
+  Leg.prototype[property] = function () {
+    return this[privateProperty];
+  };
+});
+
+pressureTable.forEach(({ pressure }) => {
+  const suffix = `${pressure}hPa`;
+
+  Leg.prototype[`wind_direction_${suffix}`] = function () {
+    return this[`_weather_wind_direction_${suffix}`];
+  };
+
+  Leg.prototype[`wind_speed_${suffix}`] = function () {
+    return this[`_weather_wind_speed_${suffix}`];
+  };
+});
 
 Leg.prototype.fetchLegWeatherData = function (weatherVariables) {
   const midpoint = this.calculateMidpoint();
-  const data = fetchWeatherData(midpoint.lat, midpoint.lon);
-  //  const today = new Date();
-  //  today.setHours(12, 0, 0, 0); // Set time to 12:00 PM
-  //  const dateString = today.toISOString().slice(0, 19) + "Z"; // Format date as ISO string
   const dateString = convertDateToISO8601(
     roundToClosestHour(getNamedRangeValue("offBlockDateTime"))
+  );
+  const data = fetchWeatherData2(
+    midpoint.lat,
+    midpoint.lon,
+    dateString,
+    weatherVariables
   );
 
   weatherVariables.forEach((variable) => {
@@ -27,7 +43,7 @@ Leg.prototype.fetchLegWeatherData = function (weatherVariables) {
 
     try {
       Logger.log(`Fetching ${variable} for Leg ${this.legNumber}...`);
-      this[cacheKey] = getWeatherVariable(data, dateString, variable);
+      this[cacheKey] = getWeatherVariable2(data, variable);
       Logger.log(
         `${variable} fetched and cached for Leg ${this.legNumber}: ${this[cacheKey]}`
       );
