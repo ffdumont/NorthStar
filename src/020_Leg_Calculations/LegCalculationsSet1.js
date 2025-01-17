@@ -4,48 +4,38 @@ Leg.prototype.toString = function () {
   return `Leg ${this.legNumber}: ${this.from.name} to ${this.to.name}, Target Alt: ${this.targetAltitude} ft`;
 };
 
-Leg.prototype.toRadians = function (degrees) {
-  return (degrees * Math.PI) / 180;
-};
-
-Leg.prototype.toDegrees = function (radians) {
-  return (radians * 180) / Math.PI;
-};
-
-Leg.prototype.toNmi = function (km) {
-  return km * 0.539957;
-};
-
 Leg.prototype.greatCircleDistance = function () {
   console.log(
     `Calculating great circle distance from ${this.from.name} to ${this.to.name}.`
   );
   const distance =
     Math.acos(
-      Math.sin(this.toRadians(this.from.lat)) *
-        Math.sin(this.toRadians(this.to.lat)) +
-        Math.cos(this.toRadians(this.from.lat)) *
-          Math.cos(this.toRadians(this.to.lat)) *
-          Math.cos(this.toRadians(this.to.lon) - this.toRadians(this.from.lon))
+      Math.sin(degreesToRadians(this.from.lat)) *
+        Math.sin(degreesToRadians(this.to.lat)) +
+        Math.cos(degreesToRadians(this.from.lat)) *
+          Math.cos(degreesToRadians(this.to.lat)) *
+          Math.cos(
+            degreesToRadians(this.to.lon) - degreesToRadians(this.from.lon)
+          )
     ) * 6371;
 
   console.log(`Distance in km: ${distance}`);
-  return this.toNmi(distance);
+  return kmToNmi(distance);
 };
 
 Leg.prototype.trueTrack = function () {
   console.log(
     `Calculating true track from ${this.from.name} to ${this.to.name}.`
   );
-  const trueTrack = this.toDegrees(
+  const trueTrack = radiansToDegrees(
     Math.atan2(
-      Math.sin(this.toRadians(this.to.lon - this.from.lon)) *
-        Math.cos(this.toRadians(this.to.lat)),
-      Math.cos(this.toRadians(this.from.lat)) *
-        Math.sin(this.toRadians(this.to.lat)) -
-        Math.sin(this.toRadians(this.from.lat)) *
-          Math.cos(this.toRadians(this.to.lat)) *
-          Math.cos(this.toRadians(this.to.lon - this.from.lon))
+      Math.sin(degreesToRadians(this.to.lon - this.from.lon)) *
+        Math.cos(degreesToRadians(this.to.lat)),
+      Math.cos(degreesToRadians(this.from.lat)) *
+        Math.sin(degreesToRadians(this.to.lat)) -
+        Math.sin(degreesToRadians(this.from.lat)) *
+          Math.cos(degreesToRadians(this.to.lat)) *
+          Math.cos(degreesToRadians(this.to.lon - this.from.lon))
     )
   );
 
@@ -58,9 +48,10 @@ Leg.prototype.magneticTrack = function () {
   console.log(`Calculating magnetic track.`);
   const magneticDeclination = this.magneticDeclination();
   const trueTrack = this.trueTrack();
-  const magneticTrack = trueTrack - magneticDeclination;
-  console.log(`Magnetic track: ${(magneticTrack + 360) % 360}`);
-  return (magneticTrack + 360) % 360;
+  const magneticTrack = (trueTrack - magneticDeclination + 360) % 360;
+  console.log(`Magnetic track: ${magneticTrack}`);
+  this.magneticTrack = magneticTrack;
+  return magneticTrack;
 };
 
 Leg.prototype.calculateMidpoint = function () {

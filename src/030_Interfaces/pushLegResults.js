@@ -6,13 +6,13 @@ function pushLegResults(route, columnName) {
     minimalSecurityAltitude: "minimalSecurityAltitude",
     temperature_2m: "temperature_2m",
     pressure_msl: "pressure_msl",
+    wind_direction: "wind_direction",
+    wind_speed: "wind_speed",
+    trueAirSpeed: "trueAirSpeed",
+    groundSpeed: "groundSpeed",
+    magneticHeading: "magneticHeading",
+    windCorrectionAngle: "windCorrectionAngle",
   };
-
-  pressureTable.forEach(({ pressure }) => {
-    const suffix = `${pressure}hPa`;
-    methodMapping[`wind_direction_${suffix}`] = `wind_direction_${suffix}`;
-    methodMapping[`wind_speed_${suffix}`] = `wind_speed_${suffix}`;
-  });
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Legs");
   if (!sheet) {
@@ -27,7 +27,7 @@ function pushLegResults(route, columnName) {
   }
 
   const lastRow = sheet.getLastRow();
-  const data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
 
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   let colIndex = headers.indexOf(columnName) + 1;
@@ -43,8 +43,14 @@ function pushLegResults(route, columnName) {
     const [legNumber] = row;
     const leg = route.legs[legNumber];
 
-    if (leg && typeof leg[methodName] === "function") {
-      columnResults.push([leg[methodName]()]);
+    if (leg) {
+      if (typeof leg[methodName] === "function") {
+        columnResults.push([leg[methodName]()]);
+      } else if (leg.hasOwnProperty(methodName)) {
+        columnResults.push([leg[methodName]]);
+      } else {
+        columnResults.push(["N/A"]);
+      }
     } else {
       columnResults.push(["N/A"]);
     }

@@ -22,22 +22,6 @@ function processRouteData() {
   );
 }
 
-function processRouteData() {
-  const route = new Route();
-  route.getWaypointsFromSheet();
-  route.getLegsFromSheet();
-  pushLegResults(route, "distance");
-  pushLegResults(route, "trueTrack");
-  pushLegResults(route, "magneticTrack");
-  pushLegResults(route, "minimalSecurityAltitude");
-  route.saveToCache(); // Cache route object after full creation
-  SpreadsheetApp.getActiveSpreadsheet().toast(
-    "Route data processed and distances updated!",
-    "Success",
-    3
-  );
-}
-
 function processWeatherData() {
   try {
     Logger.log("Attempting to load route from cache...");
@@ -53,6 +37,8 @@ function processWeatherData() {
 
       Logger.log("Weather data fetched, saving to cache...");
       route.saveToCache();
+      pushLegResults(route, "groundSpeed");
+      pushLegResults(route, "magneticHeading");
       SpreadsheetApp.getActiveSpreadsheet().toast(
         "Weather data fetched and applied!",
         "Success",

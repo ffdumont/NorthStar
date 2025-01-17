@@ -1,41 +1,8 @@
-function fetchWeatherData1(latitude, longitude, weatherVariables) {
-  if (!weatherVariables || !Array.isArray(weatherVariables)) {
-    throw new Error("weatherVariables must be a non-empty array");
-  }
-
-  const variablesQuery = weatherVariables.join(",");
-
-  const url = `https://fetch-weather-service-crxvm2tubq-od.a.run.app/data?latitude=${latitude}&longitude=${longitude}&variables=${variablesQuery}`;
-  Logger.log(url);
-  const response = UrlFetchApp.fetch(url);
-  const data = JSON.parse(response.getContentText());
-
-  // Return the parsed data
-  return data;
-}
-
-function getWeatherVariable1(data, date, variable) {
-  const result = data.find(function (entry) {
-    const entryDate = new Date(entry.date).toISOString().slice(0, 19) + "Z"; // Normalize to remove milliseconds
-    return entryDate === date;
-  });
-
-  if (result) {
-    if (result.hasOwnProperty(variable)) {
-      return result[variable];
-    } else {
-      throw new Error(`Variable "${variable}" not found in data`);
-    }
-  } else {
-    throw new Error(`No data found for date "${date}"`);
-  }
-}
-
-function getWeatherVariable2(data, variable) {
+function getWeatherVariable(data, variable) {
   /**
    * Extracts the value of a specific weather variable from the weather data.
    *
-   * @param {Object} data - The weather data object returned by fetchWeatherData2.
+   * @param {Object} data - The weather data object returned by fetchWeatherData.
    * @param {string} variable - The name of the weather variable to extract.
    * @returns {number|null} - The value of the variable if found, otherwise null.
    */
@@ -52,7 +19,7 @@ function getWeatherVariable2(data, variable) {
   }
 }
 
-function fetchWeatherData2(latitude, longitude, dateTimeISO, variables) {
+function fetchWeatherData(latitude, longitude, dateTimeISO, variables) {
   /**
    * Fetch weather data for specific coordinates and ISO date-time.
    *
@@ -71,6 +38,7 @@ function fetchWeatherData2(latitude, longitude, dateTimeISO, variables) {
     `longitude=${encodeURIComponent(longitude)}`,
     `hourly=${encodeURIComponent(variables.join(","))}`,
     `models=meteofrance_seamless`,
+    "wind_speed_unit=kn",
   ].join("&");
 
   const url = `${baseUrl}?${queryParams}`;
@@ -125,7 +93,7 @@ function fetchWeatherData2(latitude, longitude, dateTimeISO, variables) {
   }
 }
 
-function testFetchWeatherData2() {
+function testFetchWeatherData() {
   // Example usage
 
   const latitude = 48.9917;
@@ -138,7 +106,7 @@ function testFetchWeatherData2() {
     "wind_direction_850hPa",
   ];
 
-  const weatherData = fetchWeatherData2(
+  const weatherData = fetchWeatherData(
     latitude,
     longitude,
     dateTimeISO,

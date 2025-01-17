@@ -67,12 +67,12 @@ class Route {
       Logger.log("Sheet 'Legs' not found.");
       return;
     }
-    const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getValues();
+    const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getValues();
 
     const legs = {};
 
     for (const row of data) {
-      const [legNumber, fromName, toName, targetAltitude] = row;
+      const [legNumber, fromName, toName, targetAltitude, trueAirSpeed] = row;
       const fromWaypoint = this.waypoints[fromName.trim().toUpperCase()];
       const toWaypoint = this.waypoints[toName.trim().toUpperCase()];
 
@@ -81,8 +81,10 @@ class Route {
           legNumber,
           fromWaypoint,
           toWaypoint,
-          targetAltitude
+          targetAltitude,
+          trueAirSpeed
         );
+        leg.magneticTrack();
         legs[leg.legNumber] = leg;
       } else {
         Logger.log(
@@ -135,7 +137,19 @@ class Route {
       }
     }
     Logger.log("Weather data fetch completed for all legs.");
-    weatherVariables.forEach((variable) => pushLegResults(this, variable));
+    const pressureLevelRegex = /_(\d+)hPa$/; // Regex to detect variables depending on pressure level
+
+    weatherVariables.forEach((variable) => {
+      const pressureMatch = variable.match(pressureLevelRegex);
+
+      if (pressureMatch) {
+        // Remove the pressure level suffix from the variable name
+        const baseVariableName = variable.replace(pressureLevelRegex, "");
+        pushLegResults(this, baseVariableName); // Use the modified name
+      } else {
+        pushLegResults(this, variable); // Use the original name for non-pressure-dependent variables
+      }
+    });
   }
 
   saveToCache() {

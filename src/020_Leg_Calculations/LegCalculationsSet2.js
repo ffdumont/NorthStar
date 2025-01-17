@@ -1,4 +1,9 @@
-const weatherProperties = ["temperature_2m", "pressure_msl"];
+const weatherProperties = [
+  "temperature_2m",
+  "pressure_msl",
+  "wind_direction",
+  "wind_speed",
+];
 
 weatherProperties.forEach((property) => {
   const privateProperty = `_weather_${property}`;
@@ -7,32 +12,25 @@ weatherProperties.forEach((property) => {
   };
 });
 
-pressureTable.forEach(({ pressure }) => {
-  const suffix = `${pressure}hPa`;
-
-  Leg.prototype[`wind_direction_${suffix}`] = function () {
-    return this[`_weather_wind_direction_${suffix}`];
-  };
-
-  Leg.prototype[`wind_speed_${suffix}`] = function () {
-    return this[`_weather_wind_speed_${suffix}`];
-  };
-});
-
 Leg.prototype.fetchLegWeatherData = function (weatherVariables) {
   const midpoint = this.calculateMidpoint();
   const dateString = convertDateToISO8601(
     roundToClosestHour(getNamedRangeValue("offBlockDateTime"))
   );
-  const data = fetchWeatherData2(
+  const data = fetchWeatherData(
     midpoint.lat,
     midpoint.lon,
     dateString,
     weatherVariables
   );
 
+  const pressureLevelRegex = /_(\d+)hPa$/; // Regex to detect variables depending on pressure level
+
   weatherVariables.forEach((variable) => {
-    const cacheKey = `_weather_${variable}`;
+    const pressureMatch = variable.match(pressureLevelRegex);
+    const cacheKey = pressureMatch
+      ? `_weather_${variable.replace(pressureLevelRegex, "")}`
+      : `_weather_${variable}`;
 
     if (this[cacheKey] != null) {
       Logger.log(
@@ -43,10 +41,22 @@ Leg.prototype.fetchLegWeatherData = function (weatherVariables) {
 
     try {
       Logger.log(`Fetching ${variable} for Leg ${this.legNumber}...`);
-      this[cacheKey] = getWeatherVariable2(data, variable);
-      Logger.log(
-        `${variable} fetched and cached for Leg ${this.legNumber}: ${this[cacheKey]}`
-      );
+      const weatherValue = getWeatherVariable(data, variable);
+
+      if (pressureMatch) {
+        // Assign value to the variable name without the suffix
+        const baseVariableName = variable.replace(pressureLevelRegex, "");
+        this[`_weather_${baseVariableName}`] = weatherValue;
+        Logger.log(
+          `${baseVariableName} (pressure-dependent) fetched and cached for Leg ${this.legNumber}: ${weatherValue}`
+        );
+      } else {
+        // Assign value normally for non-pressure-dependent variables
+        this[cacheKey] = weatherValue;
+        Logger.log(
+          `${variable} fetched and cached for Leg ${this.legNumber}: ${weatherValue}`
+        );
+      }
     } catch (error) {
       Logger.log(
         `Error fetching ${variable} for Leg ${this.legNumber}: ${error.message}`

@@ -1,10 +1,22 @@
+function degreesToRadians(degrees) {
+  return (degrees * Math.PI) / 180;
+}
+
+function radiansToDegrees(radians) {
+  return (radians * 180) / Math.PI;
+}
+
+function kmToNmi(km) {
+  return km * 0.539957;
+}
+
 /**
  * Get the value from a named range in the active sheet.
  * @param {string} name - The name of the named range to retrieve.
  * @returns {*} The value in the named range, or null if the range does not exist.
  */
 function getNamedRangeValue(name) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Route");
   const namedRanges = sheet.getNamedRanges();
   const namedRange = namedRanges.find((range) => range.getName() === name);
 
@@ -14,11 +26,6 @@ function getNamedRangeValue(name) {
   }
 
   return namedRange.getRange().getValue();
-}
-
-function testGetNamedRangeValue() {
-  const offBlockDateTime = getNamedRangeValue("offBlockDateTime");
-  Logger.log(`offBlockDateTime: "${offBlockDateTime}"`);
 }
 
 /**
@@ -34,19 +41,6 @@ function convertDateToISO8601(date) {
 
   // Format the date to ISO 8601 with Z suffix for UTC time
   return date.toISOString().slice(0, 19) + "Z";
-}
-
-function testDateConversion() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const namedDateValue = getNamedRangeValue("offBlockDateTime"); // Assuming you have a named range
-  const date = new Date(namedDateValue); // Convert the value to a Date object
-
-  try {
-    const isoDate = convertDateToISO8601(date);
-    Logger.log(`Converted date in ISO 8601 format: ${isoDate}`);
-  } catch (error) {
-    Logger.log(`Error converting date: ${error.message}`);
-  }
 }
 
 /**
