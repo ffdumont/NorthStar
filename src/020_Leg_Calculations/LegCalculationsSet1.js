@@ -10,12 +10,13 @@ Leg.prototype.greatCircleDistance = function () {
   );
   const distance =
     Math.acos(
-      Math.sin(degreesToRadians(this.from.lat)) *
-        Math.sin(degreesToRadians(this.to.lat)) +
-        Math.cos(degreesToRadians(this.from.lat)) *
-          Math.cos(degreesToRadians(this.to.lat)) *
+      Math.sin(degreesToRadians(this.from.latitude)) *
+        Math.sin(degreesToRadians(this.to.latitude)) +
+        Math.cos(degreesToRadians(this.from.latitude)) *
+          Math.cos(degreesToRadians(this.to.latitude)) *
           Math.cos(
-            degreesToRadians(this.to.lon) - degreesToRadians(this.from.lon)
+            degreesToRadians(this.to.longitude) -
+              degreesToRadians(this.from.longitude)
           )
     ) * 6371;
 
@@ -29,13 +30,13 @@ Leg.prototype.trueTrack = function () {
   );
   const trueTrack = radiansToDegrees(
     Math.atan2(
-      Math.sin(degreesToRadians(this.to.lon - this.from.lon)) *
-        Math.cos(degreesToRadians(this.to.lat)),
-      Math.cos(degreesToRadians(this.from.lat)) *
-        Math.sin(degreesToRadians(this.to.lat)) -
-        Math.sin(degreesToRadians(this.from.lat)) *
-          Math.cos(degreesToRadians(this.to.lat)) *
-          Math.cos(degreesToRadians(this.to.lon - this.from.lon))
+      Math.sin(degreesToRadians(this.to.longitude - this.from.longitude)) *
+        Math.cos(degreesToRadians(this.to.latitude)),
+      Math.cos(degreesToRadians(this.from.latitude)) *
+        Math.sin(degreesToRadians(this.to.latitude)) -
+        Math.sin(degreesToRadians(this.from.latitude)) *
+          Math.cos(degreesToRadians(this.to.latitude)) *
+          Math.cos(degreesToRadians(this.to.longitude - this.from.longitude))
     )
   );
 
@@ -58,22 +59,26 @@ Leg.prototype.calculateMidpoint = function () {
   console.log(
     `Calculating midpoint between ${this.from.name} and ${this.to.name}.`
   );
-  const midLat = (this.from.lat + this.to.lat) / 2;
-  const midLon = (this.from.lon + this.to.lon) / 2;
+  const midLat = (this.from.latitude + this.to.latitude) / 2;
+  const midLon = (this.from.longitude + this.to.longitude) / 2;
   console.log(`Midpoint: lat ${midLat}, lon ${midLon}`);
-  return { lat: midLat, lon: midLon };
+  return { latitude: midLat, longitude: midLon };
 };
 
 Leg.prototype.magneticDeclination = function () {
   console.log(`Fetching magnetic declination at midpoint.`);
   const midpoint = this.calculateMidpoint();
-  return fetchNoaaGeomagData(midpoint.lat, midpoint.lon, "declination");
+  return fetchNoaaGeomagData(
+    midpoint.latitude,
+    midpoint.longitude,
+    "declination"
+  );
 };
 
 Leg.prototype.elevation = function () {
   console.log(`Fetching elevation at midpoint.`);
   const midpoint = this.calculateMidpoint();
-  return fetchIgnGeopfData(midpoint.lat, midpoint.lon);
+  return fetchIgnGeopfData(midpoint.latitude, midpoint.longitude);
 };
 
 Leg.prototype.minimalSecurityAltitude = function () {

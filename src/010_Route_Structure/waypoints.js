@@ -2,13 +2,12 @@ let waypoints = {}; // Global scope
 
 // Waypoint Class Definition
 class Waypoint {
-  constructor(name, lat, lon) {
+  constructor(name, latitude, longitude) {
     this.name = name;
-    this.lat = lat;
-    this.lon = lon;
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
-
   toString() {
-    return `${this.name}: (${this.lat}, ${this.lon})`;
+    return `${this.name}: (${this.latitude}, ${this.longitude})`;
   }
 }

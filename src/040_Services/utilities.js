@@ -10,6 +10,10 @@ function kmToNmi(km) {
   return km * 0.539957;
 }
 
+function mToFt(m) {
+  return m * 3.28084;
+}
+
 /**
  * Get the value from a named range in the active sheet.
  * @param {string} name - The name of the named range to retrieve.
@@ -41,6 +45,58 @@ function convertDateToISO8601(date) {
 
   // Format the date to ISO 8601 with Z suffix for UTC time
   return date.toISOString().slice(0, 19) + "Z";
+}
+
+function convertDateToYYYYMMDD_HHMM(input) {
+  let date;
+
+  // If input is a Date object, use it directly; otherwise, parse the string
+  if (input instanceof Date) {
+    date = input;
+  } else if (typeof input === "string") {
+    const parts = input.match(
+      /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/
+    );
+    if (!parts) {
+      throw new Error(
+        "Invalid date format. Expected format: DD/MM/YYYY HH:mm:ss"
+      );
+    }
+    const day = parseInt(parts[1], 10);
+    const month = parseInt(parts[2], 10) - 1; // Months are zero-based in JS
+    const year = parseInt(parts[3], 10);
+    const hours = parseInt(parts[4], 10);
+    const minutes = parseInt(parts[5], 10);
+    date = new Date(year, month, day, hours, minutes);
+  } else {
+    throw new Error(
+      "Invalid input type. Expected a Date object or a string in DD/MM/YYYY HH:mm:ss format."
+    );
+  }
+
+  // Format components with leading zeros where necessary
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}${month}${day}_${hours}${minutes}`;
+}
+
+// ✅ **Example usage in GAS**
+function testConvertDateToCustomFormat() {
+  const formattedDate1 = convertDateToCustomFormat("26/01/2025 09:08:00");
+  Logger.log(formattedDate1); // Output: "20250126_0908"
+
+  const formattedDate2 = convertDateToCustomFormat(new Date(2025, 0, 26, 9, 8)); // Month is 0-based
+  Logger.log(formattedDate2); // Output: "20250126_0908"
+}
+
+// Example usage in Google Apps Script
+function testConvertDateToCustomFormat() {
+  const formattedDate = convertDateToCustomFormat("26/01/2025 09:08:00");
+  Logger.log(formattedDate); // Output: "20250126_0908"
 }
 
 /**
