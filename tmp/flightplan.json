@@ -1,0 +1,252 @@
+{
+  "name": "LFXU-LFON-LFOL-LFPD-LFXU",
+  "routes": [
+    {
+      "name": "LFXU-LFON",
+      "departureAirfield": {
+        "airfieldName": "LES MUREAUX",
+        "airfieldDesignator": "LFXU",
+        "latitude": 48.998611,
+        "longitude": 1.941667
+      },
+      "destinationAirfield": {
+        "airfieldName": "DREUX VERNOUILLET",
+        "airfieldDesignator": "LFON",
+        "latitude": 48.705833,
+        "longitude": 1.361389
+      },
+      "legs": {
+        "1": {
+          "name": "XUSW - MEZER",
+          "legNumber": 1,
+          "from": {
+            "name": "XUSW",
+            "latitude": 48.961992,
+            "longitude": 1.9188
+          },
+          "to": {
+            "name": "MEZER",
+            "latitude": 48.93333,
+            "longitude": 1.743056
+          },
+          "targetAltitude": 1400.0000448,
+          "trueTrack": 256.12018726427533,
+          "magneticDeclination": null,
+          "magneticTrack": 254.4440672642753,
+          "magneticHeading": 257.090192307829,
+          "_weather_pressure_msl": 1027.4,
+          "_weather_temperature_2m": 1.2,
+          "_weather_wind_direction": 298,
+          "_weather_wind_speed": 6.7,
+          "trueAirSpeed": 100,
+          "groundSpeed": 95.14449628785616
+        },
+        "2": {
+          "name": "MEZER - ONEE",
+          "legNumber": 2,
+          "from": {
+            "name": "MEZER",
+            "latitude": 48.93333,
+            "longitude": 1.743056
+          },
+          "to": {
+            "name": "ONEE",
+            "latitude": 48.707117,
+            "longitude": 1.475825
+          },
+          "targetAltitude": 1900.0000608,
+          "trueTrack": 217.97685129530973,
+          "magneticDeclination": null,
+          "magneticTrack": 216.35983129530973,
+          "magneticHeading": 220.42779859654792,
+          "_weather_pressure_msl": 1027.6,
+          "_weather_temperature_2m": 0,
+          "_weather_wind_direction": 304,
+          "_weather_wind_speed": 7.1,
+          "trueAirSpeed": 100,
+          "groundSpeed": 99.70765620563259
+        }
+      },
+      "waypoints": {}
+    },
+    {
+      "name": "LFON-LFOL",
+      "departureAirfield": {
+        "airfieldName": "DREUX VERNOUILLET",
+        "airfieldDesignator": "LFON",
+        "latitude": 48.705833,
+        "longitude": 1.361389
+      },
+      "destinationAirfield": {
+        "airfieldName": "L'AIGLE SAINT MICHEL",
+        "airfieldDesignator": "LFOL",
+        "latitude": 48.758889,
+        "longitude": 0.657778
+      },
+      "legs": {
+        "1": {
+          "name": "ONWW - OLSE",
+          "legNumber": 1,
+          "from": {
+            "name": "ONWW",
+            "latitude": 48.706161,
+            "longitude": 1.262477
+          },
+          "to": {
+            "name": "OLSE",
+            "latitude": 48.690154,
+            "longitude": 0.717452
+          },
+          "targetAltitude": 1900.0000608,
+          "trueTrack": 267.6569224074209,
+          "magneticDeclination": null,
+          "magneticTrack": 266.2155824074209,
+          "magneticHeading": 269.62274347300496,
+          "_weather_pressure_msl": 1027.8,
+          "_weather_temperature_2m": -0.1,
+          "_weather_wind_direction": 304,
+          "_weather_wind_speed": 9.7,
+          "trueAirSpeed": 100,
+          "groundSpeed": 92.3338797816114
+        }
+      },
+      "waypoints": {}
+    },
+    {
+      "name": "LFOL-LFPD",
+      "departureAirfield": {
+        "airfieldName": "L'AIGLE SAINT MICHEL",
+        "airfieldDesignator": "LFOL",
+        "latitude": 48.758889,
+        "longitude": 0.657778
+      },
+      "destinationAirfield": {
+        "airfieldName": "BERNAY SAINT MARTIN",
+        "airfieldDesignator": "LFPD",
+        "latitude": 49.1025,
+        "longitude": 0.565556
+      },
+      "legs": {
+        "1": {
+          "name": "OLSW - PDSW",
+          "legNumber": 1,
+          "from": {
+            "name": "OLSW",
+            "latitude": 48.690253,
+            "longitude": 0.578274
+          },
+          "to": {
+            "name": "PDSW",
+            "latitude": 49.047544,
+            "longitude": 0.482541
+          },
+          "targetAltitude": 1900.0000608,
+          "trueTrack": 350.04045058033023,
+          "magneticDeclination": null,
+          "magneticTrack": 348.7439105803303,
+          "magneticHeading": 343.92837608468477,
+          "_weather_pressure_msl": 1027.7,
+          "_weather_temperature_2m": 0.4,
+          "_weather_wind_direction": 299,
+          "_weather_wind_speed": 11,
+          "trueAirSpeed": 100,
+          "groundSpeed": 92.8917439807046
+        }
+      },
+      "waypoints": {}
+    },
+    {
+      "name": "LFPD-LFXU",
+      "departureAirfield": {
+        "airfieldName": "BERNAY SAINT MARTIN",
+        "airfieldDesignator": "LFPD",
+        "latitude": 49.1025,
+        "longitude": 0.565556
+      },
+      "destinationAirfield": {
+        "airfieldName": "LES MUREAUX",
+        "airfieldDesignator": "LFXU",
+        "latitude": 48.998611,
+        "longitude": 1.941667
+      },
+      "legs": {
+        "1": {
+          "name": "PDNE - LFFF/EG",
+          "legNumber": 1,
+          "from": {
+            "name": "PDNE",
+            "latitude": 49.150721,
+            "longitude": 0.634007
+          },
+          "to": {
+            "name": "LFFF/EG",
+            "latitude": 49.2378,
+            "longitude": 1.40472
+          },
+          "targetAltitude": 1900.0000608,
+          "trueTrack": 79.89938484276153,
+          "magneticDeclination": null,
+          "magneticTrack": 78.47357484276154,
+          "magneticHeading": 75.06380290286766,
+          "_weather_pressure_msl": 1027.2,
+          "_weather_temperature_2m": 0.1,
+          "_weather_wind_direction": 282,
+          "_weather_wind_speed": 14.9,
+          "trueAirSpeed": 100,
+          "groundSpeed": 113.66145346377841
+        },
+        "2": {
+          "name": "LFFF/EG - TDFAI",
+          "legNumber": 2,
+          "from": {
+            "name": "LFFF/EG",
+            "latitude": 49.2378,
+            "longitude": 1.40472
+          },
+          "to": {
+            "name": "TDFAI",
+            "latitude": 49.089676,
+            "longitude": 1.762016
+          },
+          "targetAltitude": 1900.0000608,
+          "trueTrack": 122.23926325461443,
+          "magneticDeclination": null,
+          "magneticTrack": 120.64477325461445,
+          "magneticHeading": 121.15106170669239,
+          "_weather_pressure_msl": 1026.8,
+          "_weather_temperature_2m": 0.6,
+          "_weather_wind_direction": 297,
+          "_weather_wind_speed": 13.9,
+          "trueAirSpeed": 100,
+          "groundSpeed": 113.87188525733526
+        },
+        "3": {
+          "name": "TDFAI - MEZY",
+          "legNumber": 3,
+          "from": {
+            "name": "TDFAI",
+            "latitude": 49.089676,
+            "longitude": 1.762016
+          },
+          "to": {
+            "name": "MEZY",
+            "latitude": 48.992383,
+            "longitude": 1.869174
+          },
+          "targetAltitude": 1400.0000448,
+          "trueTrack": 144.1308248678018,
+          "magneticDeclination": null,
+          "magneticTrack": 142.46300486780183,
+          "magneticHeading": 144.6643639239488,
+          "_weather_pressure_msl": 1027.3,
+          "_weather_temperature_2m": 0.4,
+          "_weather_wind_direction": 305,
+          "_weather_wind_speed": 12.8,
+          "trueAirSpeed": 100,
+          "groundSpeed": 112.21005969550896
+        }
+      },
+      "waypoints": {}
+    }
+  ]
+}

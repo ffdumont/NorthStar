@@ -24,7 +24,7 @@ Leg.prototype.greatCircleDistance = function () {
   return kmToNmi(distance);
 };
 
-Leg.prototype.trueTrack = function () {
+Leg.prototype.calculateTrueTrack = function () {
   console.log(
     `Calculating true track from ${this.from.name} to ${this.to.name}.`
   );
@@ -42,13 +42,14 @@ Leg.prototype.trueTrack = function () {
 
   const adjustedTrack = trueTrack < 0 ? trueTrack + 360 : trueTrack;
   console.log(`True track: ${adjustedTrack}`);
+  this.trueTrack = adjustedTrack;
   return adjustedTrack;
 };
 
-Leg.prototype.magneticTrack = function () {
+Leg.prototype.calculateMagneticTrack = function () {
   console.log(`Calculating magnetic track.`);
-  const magneticDeclination = this.magneticDeclination();
-  const trueTrack = this.trueTrack();
+  const magneticDeclination = this.calculateMagneticDeclination();
+  const trueTrack = this.trueTrack;
   const magneticTrack = (trueTrack - magneticDeclination + 360) % 360;
   console.log(`Magnetic track: ${magneticTrack}`);
   this.magneticTrack = magneticTrack;
@@ -65,7 +66,7 @@ Leg.prototype.calculateMidpoint = function () {
   return { latitude: midLat, longitude: midLon };
 };
 
-Leg.prototype.magneticDeclination = function () {
+Leg.prototype.calculateMagneticDeclination = function () {
   console.log(`Fetching magnetic declination at midpoint.`);
   const midpoint = this.calculateMidpoint();
   return fetchNoaaGeomagData(

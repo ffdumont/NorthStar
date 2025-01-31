@@ -1,7 +1,10 @@
 class FlightPlan {
-  constructor(routes) {
-    this.routes = routes; // Array of Route objects
+  constructor(routes, name) {
+    // ✅ Add `name` parameter
+    this.name = name; // ✅ Store the generated flight plan name
+    this.routes = routes; // ✅ Store routes array
   }
+
   saveToCache() {
     const cache = CacheService.getScriptCache();
     cache.put("flightPlan", JSON.stringify(this), 21600); // Cache for 6 hours
@@ -126,16 +129,18 @@ function constructFlightPlan(routes) {
       // Target altitude is set by the altitude of the "from" waypoint
       const targetAltitude = mToFt(route.waypoints[i].waypointAltitude) || 0;
 
-      // Create the leg object
+      // ✅ Create leg with name included in the constructor
+      const legName = `${fromWaypoint.name} - ${toWaypoint.name}`;
       const leg = new Leg(
+        legName, // ✅ Name assigned directly in the constructor
         legNumber,
         fromWaypoint,
         toWaypoint,
         targetAltitude,
         100
       ); // TrueAirSpeed defaulted to 100
-      leg.name = `${fromWaypoint.name} - ${toWaypoint.name}`; // Assign leg name
-
+      leg.calculateTrueTrack(); // Calculate true track
+      leg.calculateMagneticTrack(); // Calculate magnetic track
       // Add the leg to the legs object with legNumber as the key
       legs[legNumber] = leg;
 
@@ -147,6 +152,17 @@ function constructFlightPlan(routes) {
     return new Route(departureAirfield, destinationAirfield, legs, route.name);
   });
 
-  // Construct the FlightPlan object
-  return new FlightPlan(constructedRoutes);
+  const airfieldSequence = constructedRoutes
+    .map((route) => route?.departureAirfield?.airfieldDesignator) // ✅ Correct property
+    .filter(Boolean) // Remove undefined values
+    .concat(
+      constructedRoutes.slice(-1)[0]?.destinationAirfield?.airfieldDesignator ||
+        "UNKNOWN"
+    ) // ✅ Correct property, safe fallback
+    .join("-"); // Join with hyphens
+
+  console.log("Generated FlightPlan Name:", airfieldSequence);
+
+  // Construct the FlightPlan object with the generated name
+  return new FlightPlan(constructedRoutes, airfieldSequence);
 }

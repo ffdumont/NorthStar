@@ -20,7 +20,8 @@ function mToFt(m) {
  * @returns {*} The value in the named range, or null if the range does not exist.
  */
 function getNamedRangeValue(name) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Route");
+  const sheet =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Settings");
   const namedRanges = sheet.getNamedRanges();
   const namedRange = namedRanges.find((range) => range.getName() === name);
 
@@ -124,4 +125,40 @@ function roundToClosestHour(date) {
   }
 
   return date;
+}
+
+function generateFlightPlanFilename(flightPlan) {
+  const airfieldIdentifiers = [];
+
+  flightPlan.routes.forEach((route) => {
+    const departureSuffix =
+      route.departureAirfield.airfieldDesignator.slice(-2);
+    if (!airfieldIdentifiers.includes(departureSuffix)) {
+      airfieldIdentifiers.push(departureSuffix);
+    }
+
+    const destinationSuffix =
+      route.destinationAirfield.airfieldDesignator.slice(-2);
+    if (!airfieldIdentifiers.includes(destinationSuffix)) {
+      airfieldIdentifiers.push(destinationSuffix);
+    }
+  });
+
+  const mergedRouteName = airfieldIdentifiers.join("");
+
+  return `${mergedRouteName}.json`; // Example: FlightPlan_XUONOLPDXU_20240131_1030.json
+}
+
+function getSheetFolder() {
+  const file = DriveApp.getFileById(
+    SpreadsheetApp.getActiveSpreadsheet().getId()
+  ); // Get active sheet file
+  const folders = file.getParents(); // Get parent folder(s)
+
+  if (folders.hasNext()) {
+    return folders.next(); // ✅ Return the first parent folder
+  } else {
+    Logger.log("Error: Google Sheet is not stored in a Drive folder.");
+    return null;
+  }
 }

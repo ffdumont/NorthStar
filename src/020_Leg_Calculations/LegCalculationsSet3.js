@@ -1,5 +1,5 @@
 // Method to calculate the ground speed
-Leg.prototype.groundSpeed = function () {
+Leg.prototype.calculateGroundSpeed = function () {
   const trackRad = degreesToRadians(this.magneticTrack);
   const windDirRad = degreesToRadians(this._weather_wind_direction);
 
@@ -11,7 +11,7 @@ Leg.prototype.groundSpeed = function () {
 };
 
 // Method to calculate the magnetic heading
-Leg.prototype.magneticHeading = function () {
+Leg.prototype.calculateMagneticHeading = function () {
   const trackRad = degreesToRadians(this.magneticTrack);
   const windDirRad = degreesToRadians(this._weather_wind_direction);
 
@@ -28,6 +28,5 @@ Leg.prototype.magneticHeading = function () {
 
 // Method to calculate the wind correction angle
 Leg.prototype.windCorrectionAngle = function () {
-  const magneticHeading = this.calculateMagneticHeading();
-  return this.magneticTrack - magneticHeading;
+  return this.magneticTrack - this.magneticHeading;
 };

@@ -11,6 +11,7 @@ mklink .\deploy\032_pushLegResults.js ..\src\030_Interfaces\pushLegResults.js
 mklink .\deploy\034_generateFlightPlanTextFile.js ..\src\030_Interfaces\generateFlightPlanTextFile.js
 mklink .\deploy\034_generateGarminFlightPlan.js ..\src\030_Interfaces\generateGarminFlightPlan.js
 mklink .\deploy\034_loadGPX.js ..\src\030_Interfaces\loadGPX.js
+mklink .\deploy\035_dumpModel.js ..\src\030_Interfaces\dumpModel.js
 mklink .\deploy\041_noaaGeomag.js ..\src\040_Services\noaaGeomag.js
 mklink .\deploy\041_ignGeopf.js ..\src\040_Services\ignGeopf.js
 mklink .\deploy\041_utilities.js ..\src\040_Services\utilities.js
