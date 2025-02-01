@@ -44,7 +44,7 @@ weatherProperties.forEach((property) => {
 });
 
 Leg.prototype.fetchLegWeatherData = function (weatherVariables) {
-  const midpoint = this.calculateMidpoint();
+  const midpoint = this.midPoint;
   const dateString = convertDateToISO8601(
     roundToClosestHour(getNamedRangeValue("offBlockDateTime"))
   );

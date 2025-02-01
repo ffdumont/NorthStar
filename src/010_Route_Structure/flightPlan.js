@@ -7,8 +7,23 @@ class FlightPlan {
 
   saveToCache() {
     const cache = CacheService.getScriptCache();
-    cache.put("flightPlan", JSON.stringify(this), 21600); // Cache for 6 hours
-    Logger.log("Flight plan saved to cache.");
+    const flightPlanJSON = JSON.stringify(this);
+
+    // Calculate the approximate size in bytes
+    const sizeInBytes = flightPlanJSON.length * 2; // UTF-16 encoding (2 bytes per character)
+
+    Logger.log(`🔹 Attempting to cache flight plan...`);
+    Logger.log(`📏 Flight plan JSON size: ${sizeInBytes} bytes`);
+
+    if (sizeInBytes > 100000) {
+      Logger.log(
+        "⚠️ Flight plan is too large to cache (100KB limit exceeded). Consider alternative storage."
+      );
+      return;
+    }
+
+    cache.put("flightPlan", flightPlanJSON, 21600); // Cache for 6 hours
+    Logger.log("✅ Flight plan successfully saved to cache.");
   }
 
   static loadFromCache() {
@@ -139,7 +154,11 @@ function constructFlightPlan(routes) {
         targetAltitude,
         100
       ); // TrueAirSpeed defaulted to 100
+      leg.calculateDistance(); // Calculate distance
+      leg.calculateMidPoint(); // Calculate midpoint
+      leg.calculateElevation();
       leg.calculateTrueTrack(); // Calculate true track
+      leg.calculateMagneticDeclination(); // Calculate magnetic declination
       leg.calculateMagneticTrack(); // Calculate magnetic track
       // Add the leg to the legs object with legNumber as the key
       legs[legNumber] = leg;

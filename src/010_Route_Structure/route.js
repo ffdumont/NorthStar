@@ -53,7 +53,7 @@ class Route {
       try {
         Logger.log(`Fetching weather data for Leg ${legNumber}...`);
         // Calculate height difference
-        const height = leg.targetAltitude - (leg.elevation() || 0);
+        const height = leg.targetAltitude - (leg.Elevation || 0);
 
         // Determine pressure level
         const pressureLevel = getPressureLevel(height);

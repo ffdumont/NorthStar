@@ -5,6 +5,7 @@ class Leg {
     this.from = from;
     this.to = to;
     this.targetAltitude = targetAltitude;
+    this.distance = null;
     this.trueTrack = null;
     this.magneticDeclination = null;
     this.magneticTrack = null;
@@ -15,5 +16,9 @@ class Leg {
     this._weather_wind_speed = null;
     this.trueAirSpeed = trueAirSpeed;
     this.groundSpeed = null;
+    this.legTimeWithoutWind = null;
+    this.legTimeWithWind = null;
+    this.midPoint = null;
+    this.elevation = null;
   }
 }

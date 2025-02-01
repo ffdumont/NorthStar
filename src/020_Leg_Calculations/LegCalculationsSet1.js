@@ -4,7 +4,7 @@ Leg.prototype.toString = function () {
   return `Leg ${this.legNumber}: ${this.from.name} to ${this.to.name}, Target Alt: ${this.targetAltitude} ft`;
 };
 
-Leg.prototype.greatCircleDistance = function () {
+Leg.prototype.calculateDistance = function () {
   console.log(
     `Calculating great circle distance from ${this.from.name} to ${this.to.name}.`
   );
@@ -21,7 +21,7 @@ Leg.prototype.greatCircleDistance = function () {
     ) * 6371;
 
   console.log(`Distance in km: ${distance}`);
-  return kmToNmi(distance);
+  return (this.distance = kmToNmi(distance));
 };
 
 Leg.prototype.calculateTrueTrack = function () {
@@ -56,33 +56,33 @@ Leg.prototype.calculateMagneticTrack = function () {
   return magneticTrack;
 };
 
-Leg.prototype.calculateMidpoint = function () {
+Leg.prototype.calculateMidPoint = function () {
   console.log(
     `Calculating midpoint between ${this.from.name} and ${this.to.name}.`
   );
   const midLat = (this.from.latitude + this.to.latitude) / 2;
   const midLon = (this.from.longitude + this.to.longitude) / 2;
   console.log(`Midpoint: lat ${midLat}, lon ${midLon}`);
-  return { latitude: midLat, longitude: midLon };
+  return (this.midPoint = { latitude: midLat, longitude: midLon });
 };
 
 Leg.prototype.calculateMagneticDeclination = function () {
-  console.log(`Fetching magnetic declination at midpoint.`);
-  const midpoint = this.calculateMidpoint();
-  return fetchNoaaGeomagData(
-    midpoint.latitude,
-    midpoint.longitude,
+  return (this.magneticDeclination = fetchNoaaGeomagData(
+    ...Object.values(this.midPoint),
     "declination"
-  );
+  ));
 };
 
-Leg.prototype.elevation = function () {
+Leg.prototype.calculateElevation = function () {
   console.log(`Fetching elevation at midpoint.`);
-  const midpoint = this.calculateMidpoint();
-  return fetchIgnGeopfData(midpoint.latitude, midpoint.longitude);
+  const midpoint = this.midPoint;
+  return (this.elevation = fetchIgnGeopfData(
+    midpoint.latitude,
+    midpoint.longitude
+  ));
 };
 
-Leg.prototype.minimalSecurityAltitude = function () {
+Leg.prototype.calculateMinimalSecurityAltitude = function () {
   console.log(`Calculating minimal security altitude.`);
   const elevation = this.elevation();
   const msa = elevation + 1000;

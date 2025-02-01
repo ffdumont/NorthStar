@@ -30,3 +30,22 @@ Leg.prototype.calculateMagneticHeading = function () {
 Leg.prototype.windCorrectionAngle = function () {
   return this.magneticTrack - this.magneticHeading;
 };
+
+// Method to calculate leg time without wind (using true airspeed)
+Leg.prototype.calculateLegTimeWithoutWind = function () {
+  if (!this.trueAirSpeed || this.trueAirSpeed <= 0) {
+    throw new Error("True Air Speed must be a positive value.");
+  }
+  this.legTimeWithoutWind = (this.distance / this.trueAirSpeed) * 60; // Convert hours to minutes
+  return this.legTimeWithoutWind;
+};
+
+// Method to calculate leg time with wind (using ground speed)
+Leg.prototype.calculateLegTimeWithWind = function () {
+  if (!this.groundSpeed || this.groundSpeed <= 0) {
+    throw new Error(
+      "Ground Speed must be calculated first and be a positive value."
+    );
+  }
+  return (this.legTimeWithWind = (this.distance / this.groundSpeed) * 60);
+};

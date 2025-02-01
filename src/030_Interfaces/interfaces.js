@@ -115,6 +115,9 @@ function processWindCorrection() {
 
       // Calculate wind correction angle
       leg.windCorrectionAngle();
+
+      leg.calculateLegTimeWithoutWind();
+      leg.calculateLegTimeWithWind();
     });
   });
   Logger.log("Final Flight Plan:");
