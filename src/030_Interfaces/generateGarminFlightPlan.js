@@ -1,7 +1,6 @@
 function generateGarminFlightPlan(flightPlan) {
   const xmlNamespace = "http://www8.garmin.com/xmlschemas/FlightPlan/v1";
 
-  // Helper function to escape XML characters
   function escapeXML(value) {
     return value
       .replace(/&/g, "&amp;")
@@ -11,7 +10,6 @@ function generateGarminFlightPlan(flightPlan) {
       .replace(/'/g, "&apos;");
   }
 
-  // Helper function to add unique route points
   function addRoutePointIfNotDuplicate(routePoint, mergedRoutePoints) {
     if (
       !mergedRoutePoints.some(
@@ -24,7 +22,6 @@ function generateGarminFlightPlan(flightPlan) {
     }
   }
 
-  // Generate the concatenated route name (e.g., XUONOLPDXU)
   const airfieldIdentifiers = [];
   flightPlan.routes.forEach((route) => {
     const departureSuffix =
@@ -41,24 +38,19 @@ function generateGarminFlightPlan(flightPlan) {
   });
   const mergedRouteName = airfieldIdentifiers.join("");
 
-  // Collect unique USER WAYPOINTs for <waypoint-table>
   const waypointSet = new Map();
   flightPlan.routes.forEach((route) => {
     Object.values(route.legs).forEach((leg) => {
-      // Add 'from' and 'to' waypoints to the map if not an airfield
-      if (!waypointSet.has(leg.from.name)) {
+      if (!waypointSet.has(leg.from.name))
         waypointSet.set(leg.from.name, leg.from);
-      }
-      if (!waypointSet.has(leg.to.name)) {
-        waypointSet.set(leg.to.name, leg.to);
-      }
+      if (!waypointSet.has(leg.to.name)) waypointSet.set(leg.to.name, leg.to);
     });
   });
 
-  // Build the <route> points
+  // ✅ FIX: Initialize mergedRoutePoints BEFORE using it
   const mergedRoutePoints = [];
+
   flightPlan.routes.forEach((route) => {
-    // Add departure airfield
     addRoutePointIfNotDuplicate(
       {
         waypointIdentifier: route.departureAirfield.airfieldDesignator,
@@ -67,26 +59,17 @@ function generateGarminFlightPlan(flightPlan) {
       mergedRoutePoints
     );
 
-    // Add intermediate waypoints
     Object.values(route.legs).forEach((leg) => {
       addRoutePointIfNotDuplicate(
-        {
-          waypointIdentifier: leg.from.name,
-          waypointType: "USER WAYPOINT",
-        },
+        { waypointIdentifier: leg.from.name, waypointType: "USER WAYPOINT" },
         mergedRoutePoints
       );
-
       addRoutePointIfNotDuplicate(
-        {
-          waypointIdentifier: leg.to.name,
-          waypointType: "USER WAYPOINT",
-        },
+        { waypointIdentifier: leg.to.name, waypointType: "USER WAYPOINT" },
         mergedRoutePoints
       );
     });
 
-    // Add destination airfield
     addRoutePointIfNotDuplicate(
       {
         waypointIdentifier: route.destinationAirfield.airfieldDesignator,
@@ -106,8 +89,6 @@ function generateGarminFlightPlan(flightPlan) {
 
   // Build the XML
   let xml = `<flight-plan xmlns="${xmlNamespace}">\n`;
-
-  // Add file description
   xml += `\t<file-description>${mergedRouteName}</file-description>\n`;
   xml += `\t<author>\n`;
   xml += `\t\t<author-name>SkyDreamSoft</author-name>\n`;
@@ -117,7 +98,6 @@ function generateGarminFlightPlan(flightPlan) {
   xml += `\t<link/>\n`;
   xml += `\t<created>${new Date().toISOString()}</created>\n`;
 
-  // Add waypoint-table
   xml += `\t<waypoint-table>\n`;
   waypointSet.forEach((waypoint) => {
     xml += `\t\t<waypoint>\n`;
@@ -131,7 +111,6 @@ function generateGarminFlightPlan(flightPlan) {
   });
   xml += `\t</waypoint-table>\n`;
 
-  // Add route
   xml += `\t<route>\n`;
   xml += `\t\t<route-name>${mergedRouteName}</route-name>\n`;
   xml += `\t\t<flight-plan-index>1</flight-plan-index>\n`;
@@ -147,14 +126,17 @@ function generateGarminFlightPlan(flightPlan) {
   });
 
   xml += `\t</route>\n`;
-
-  // Close XML
   xml += `</flight-plan>\n`;
 
-  // Write the file to Google Drive
-  const fileName = `${mergedRouteName}.xml`;
-  const file = DriveApp.createFile(fileName, xml, MimeType.PLAIN_TEXT);
+  const folder = getSheetFolder();
+  if (!folder) {
+    Logger.log("⚠️ Error: Unable to find the Google Sheet folder.");
+    return null;
+  }
 
-  Logger.log(`Flight plan XML created: ${file.getUrl()}`);
-  return file.getUrl(); // Return file URL
+  const fileName = `${mergedRouteName}.xml`;
+  const file = folder.createFile(fileName, xml, MimeType.PLAIN_TEXT);
+  Logger.log(`✅ Garmin Flight Plan XML created: ${file.getUrl()}`);
+
+  return file.getUrl();
 }

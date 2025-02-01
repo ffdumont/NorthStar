@@ -72,10 +72,17 @@ function generateFlightPlanTextFile(flightPlan) {
     content += "\n";
   });
 
-  // Write the content to a file with the merged route name
-  const fileName = `${mergedRouteName}.txt`;
-  const file = DriveApp.createFile(fileName, content);
-  Logger.log(`Flight plan file created: ${file.getUrl()}`);
+  // Get the Sheet folder and store the file inside it
+  const folder = getSheetFolder();
+  if (!folder) {
+    Logger.log("⚠️ Error: Unable to find the Google Sheet folder.");
+    return null;
+  }
 
-  return file.getUrl(); // Return the file URL for reference
+  // Write the content to a file inside the correct folder
+  const fileName = `${mergedRouteName}.txt`;
+  const file = folder.createFile(fileName, content, MimeType.PLAIN_TEXT);
+  Logger.log(`✅ Flight plan text file created: ${file.getUrl()}`);
+
+  return file.getUrl();
 }
