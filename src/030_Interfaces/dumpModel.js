@@ -6,6 +6,7 @@ function dumpFlightPlanData(flightPlan) {
   let routes = new Map(); // Store unique Routes
   let legs = new Map(); // Store unique Legs using the generated `leg.name`
   let waypoints = new Map(); // Store unique Waypoints
+  let airfields = new Map(); // Store unique Airfields
 
   // Store FlightPlan details (name and associated routes)
   flightPlans.push({
@@ -64,17 +65,25 @@ function dumpFlightPlanData(flightPlan) {
       );
     }
   });
-
+  flightPlan.airfields.forEach((airfield) => {
+    let airfieldData = {};
+    Object.keys(airfield).forEach((attr) => {
+      airfieldData[attr] = airfield[attr];
+    });
+    airfields.set(airfield.airfieldDesignator, airfieldData);
+  });
   // Convert Maps to Arrays for dumping
   let routeArray = Array.from(routes.values());
   let legArray = Array.from(legs.values()); // ✅ Now using `leg.name` as the primary key
   let waypointArray = Array.from(waypoints.values());
+  let airfieldArray = Array.from(airfields.values());
 
   // Dump all extracted objects into separate sheets
   dumpInstancesToSheets(flightPlans, "FlightPlans"); // ✅ FlightPlan name included
   dumpInstancesToSheets(routeArray, "Routes");
   dumpInstancesToSheets(legArray, "Legs");
   dumpInstancesToSheets(waypointArray, "Waypoints");
+  dumpInstancesToSheets(airfieldArray, "Airfields");
 }
 
 function dumpInstancesToSheets(objects, sheetName) {

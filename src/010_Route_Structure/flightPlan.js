@@ -1,8 +1,9 @@
 class FlightPlan {
-  constructor(routes, name) {
+  constructor(routes, name, airfields) {
     // ✅ Add `name` parameter
     this.name = name; // ✅ Store the generated flight plan name
     this.routes = routes; // ✅ Store routes array
+    this.airfields = airfields; // ✅ Collect airfields from routes
   }
 
   saveToCache() {
@@ -76,12 +77,14 @@ class Airfield {
     this.airfieldDesignator = airfieldDesignator;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.taxiTime = 5; // Default taxi time of 10 minutes
+    this.departureProcedureTime = 10; // Default departure procedure time of 10 minutes
+    this.arrivalProcedureTime = 10; // Default arrival procedure time of 10 minutes
   }
 }
 
 function constructFlightPlan(routes) {
   const constructedRoutes = routes.map((route) => {
-    // Extract first and last airfield waypoints for the route
     const firstAirfield = route.waypoints[0]; // First waypoint (always airfield)
     const lastAirfield = route.waypoints[route.waypoints.length - 1]; // Last waypoint (always airfield)
 
@@ -96,7 +99,7 @@ function constructFlightPlan(routes) {
       );
     }
 
-    // Create Airfield objects for departure and destination
+    // Create Airfield objects
     const departureAirfield = new Airfield(
       firstAirfield.airfieldName,
       firstAirfield.airfieldDesignator,
@@ -111,77 +114,43 @@ function constructFlightPlan(routes) {
       lastAirfield.longitude
     );
 
-    // Cache to store unique Waypoint objects
-    const waypointCache = new Map();
-
-    // Helper function to get or create a Waypoint
-    function getOrCreateWaypoint(waypointData) {
-      if (!waypointCache.has(waypointData.waypointName)) {
-        const waypoint = new Waypoint(
-          waypointData.waypointName,
-          waypointData.latitude,
-          waypointData.longitude
-        );
-        waypointCache.set(waypointData.waypointName, waypoint);
-      }
-      return waypointCache.get(waypointData.waypointName);
-    }
-
-    // Construct Leg objects for the route
-    // Exclude the first waypoint (departure airfield) and the last waypoint (destination airfield)
-    const legs = {};
-    let legNumber = 1; // Start leg numbering at 1
-
-    for (let i = 1; i < route.waypoints.length - 1; i++) {
-      // Ensure we skip the leg that ends at the destination airfield
-      if (i + 1 === route.waypoints.length - 1) {
-        break; // Exit the loop before creating a leg to the destination airfield
-      }
-
-      const fromWaypoint = getOrCreateWaypoint(route.waypoints[i]);
-      const toWaypoint = getOrCreateWaypoint(route.waypoints[i + 1]);
-
-      // Target altitude is set by the altitude of the "from" waypoint
-      const targetAltitude = mToFt(route.waypoints[i].waypointAltitude) || 0;
-
-      // ✅ Create leg with name included in the constructor
-      const legName = `${fromWaypoint.name} - ${toWaypoint.name}`;
-      const leg = new Leg(
-        legName, // ✅ Name assigned directly in the constructor
-        legNumber,
-        fromWaypoint,
-        toWaypoint,
-        targetAltitude,
-        100
-      ); // TrueAirSpeed defaulted to 100
-      leg.calculateDistance(); // Calculate distance
-      leg.calculateMidPoint(); // Calculate midpoint
-      leg.calculateElevation();
-      leg.calculateTrueTrack(); // Calculate true track
-      leg.calculateMagneticDeclination(); // Calculate magnetic declination
-      leg.calculateMagneticTrack(); // Calculate magnetic track
-      // Add the leg to the legs object with legNumber as the key
-      legs[legNumber] = leg;
-
-      // Increment the leg number
-      legNumber++;
-    }
-
     // Construct the Route object
-    return new Route(departureAirfield, destinationAirfield, legs, route.name);
+    return new Route(
+      departureAirfield,
+      destinationAirfield,
+      route.legs,
+      route.name
+    );
   });
 
+  // ✅ Collect airfields once, outside of FlightPlan
+  function collectAirfields(routes) {
+    const airfieldMap = new Map();
+    routes.forEach((route) => {
+      airfieldMap.set(
+        route.departureAirfield.airfieldDesignator,
+        route.departureAirfield
+      );
+      airfieldMap.set(
+        route.destinationAirfield.airfieldDesignator,
+        route.destinationAirfield
+      );
+    });
+    return Array.from(airfieldMap.values());
+  }
+
+  const airfields = collectAirfields(constructedRoutes); // ✅ Collect airfields once
   const airfieldSequence = constructedRoutes
-    .map((route) => route?.departureAirfield?.airfieldDesignator) // ✅ Correct property
-    .filter(Boolean) // Remove undefined values
+    .map((route) => route?.departureAirfield?.airfieldDesignator)
+    .filter(Boolean)
     .concat(
       constructedRoutes.slice(-1)[0]?.destinationAirfield?.airfieldDesignator ||
         "UNKNOWN"
-    ) // ✅ Correct property, safe fallback
-    .join("-"); // Join with hyphens
+    )
+    .join("-");
 
   console.log("Generated FlightPlan Name:", airfieldSequence);
 
-  // Construct the FlightPlan object with the generated name
-  return new FlightPlan(constructedRoutes, airfieldSequence);
+  // ✅ Pass airfields explicitly to FlightPlan constructor
+  return new FlightPlan(constructedRoutes, airfieldSequence, airfields);
 }
