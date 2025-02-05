@@ -186,8 +186,13 @@ function loadFlightPlanFromDrive() {
   const file = files.next();
   const jsonString = file.getBlob().getDataAsString();
   Logger.log("Loaded Flight Plan from Drive: " + filename);
+  const flightPlan = loadFlightPlanFromJSON(jsonString);
 
-  return loadFlightPlanFromJSON(jsonString); // Convert JSON to FlightPlan object
+  if (flightPlan) {
+    flightPlan.saveToCache(); // ✅ Save to cache
+  }
+
+  return flightPlan;
 }
 function loadFlightPlanFromJSON(jsonString) {
   try {
