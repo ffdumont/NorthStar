@@ -27,7 +27,6 @@ function dumpFlightPlanData(flightPlan) {
         .map((leg) => leg.name)
         .join(", "),
       routeTime: route.routeTime || 0, // ✅ Include route time
-      procedureTime: route.procedureTime || 0, // ✅ Include procedure time
     });
 
     if (typeof route.legs === "object" && route.legs !== null) {
