@@ -8,21 +8,26 @@ function dumpFlightPlanData(flightPlan) {
   let waypoints = new Map(); // Store unique Waypoints
   let airfields = new Map(); // Store unique Airfields
 
-  // Store FlightPlan details (name and associated routes)
+  // ✅ Store FlightPlan details, including time fields
   flightPlans.push({
-    name: flightPlan.name, // ✅ Include flight plan name
-    routes: flightPlan.routes.map((route) => route.name).join(", "), // Store route names as a list
+    name: flightPlan.name,
+    routes: flightPlan.routes.map((route) => route.name).join(", "),
+    flightPlanTime: flightPlan.flightPlanTime || 0,
+    finalReserveTime: flightPlan.finalReserveTime || 0,
+    captainReserveTime: flightPlan.captainReserveTime || 0,
   });
 
   // Traverse all objects dynamically
   flightPlan.routes.forEach((route) => {
     routes.set(route.name, {
       name: route.name,
-      departure: route.departureAirfield.airfieldDesignator, // ✅ Only store designator
-      destination: route.destinationAirfield.airfieldDesignator, // ✅ Only store designator
+      departure: route.departureAirfield.airfieldDesignator,
+      destination: route.destinationAirfield.airfieldDesignator,
       legs: Object.values(route.legs)
         .map((leg) => leg.name)
-        .join(", "), // Store leg names
+        .join(", "),
+      routeTime: route.routeTime || 0, // ✅ Include route time
+      procedureTime: route.procedureTime || 0, // ✅ Include procedure time
     });
 
     if (typeof route.legs === "object" && route.legs !== null) {
@@ -36,6 +41,11 @@ function dumpFlightPlanData(flightPlan) {
         Object.keys(leg).forEach((attr) => {
           legData[attr] = leg[attr]; // Copy all properties dynamically
         });
+
+        // ✅ Include time-related properties at leg level
+        legData.legTimeWithoutWind = leg.legTimeWithoutWind || 0;
+        legData.legTimeWithWind = leg.legTimeWithWind || 0;
+        legData.LegMaxTime = leg.getLegMaxTime ? leg.getLegMaxTime() : 0; // If method exists
 
         legs.set(leg.name, legData); // Store the full leg object
 
@@ -65,23 +75,35 @@ function dumpFlightPlanData(flightPlan) {
       );
     }
   });
+
+  // ✅ Include all airfields
   flightPlan.airfields.forEach((airfield) => {
     let airfieldData = {};
+
+    // Copy all properties dynamically
     Object.keys(airfield).forEach((attr) => {
       airfieldData[attr] = airfield[attr];
     });
+
+    // ✅ Include relevant time-related properties
+    airfieldData.taxiOutTime = airfield.TaxiOutTime || 0;
+    airfieldData.departureProcedureTime = airfield.DepartureProcedureTime || 0;
+    airfieldData.taxiInTime = airfield.TaxiInTime || 0;
+    airfieldData.arrivalProcedureTime = airfield.ArrivalProcedureTime || 0;
+
     airfields.set(airfield.airfieldDesignator, airfieldData);
   });
+
   // Convert Maps to Arrays for dumping
   let routeArray = Array.from(routes.values());
-  let legArray = Array.from(legs.values()); // ✅ Now using `leg.name` as the primary key
+  let legArray = Array.from(legs.values());
   let waypointArray = Array.from(waypoints.values());
   let airfieldArray = Array.from(airfields.values());
 
   // Dump all extracted objects into separate sheets
-  dumpInstancesToSheets(flightPlans, "FlightPlans"); // ✅ FlightPlan name included
-  dumpInstancesToSheets(routeArray, "Routes");
-  dumpInstancesToSheets(legArray, "Legs");
+  dumpInstancesToSheets(flightPlans, "FlightPlans"); // ✅ Now includes FlightPlan time fields
+  dumpInstancesToSheets(routeArray, "Routes"); // ✅ Includes routeTime & procedureTime
+  dumpInstancesToSheets(legArray, "Legs"); // ✅ Includes leg time fields
   dumpInstancesToSheets(waypointArray, "Waypoints");
   dumpInstancesToSheets(airfieldArray, "Airfields");
 }

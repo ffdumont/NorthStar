@@ -116,10 +116,18 @@ function processWindCorrection() {
       // Calculate wind correction angle
       leg.windCorrectionAngle();
 
+      // Calculate leg times
       leg.calculateLegTimeWithoutWind();
       leg.calculateLegTimeWithWind();
     });
+
+    // ✅ Calculate route time after processing all legs
+    route.calculateRouteTime();
   });
+
+  // ✅ Now, calculate flight plan time using updated route times
+  flightPlan.calculateFlightPlanTime();
+
   Logger.log("Final Flight Plan:");
   Logger.log(JSON.stringify(flightPlan, null, 2));
 

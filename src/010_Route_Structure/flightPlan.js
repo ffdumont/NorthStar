@@ -4,6 +4,9 @@ class FlightPlan {
     this.name = name; // ✅ Store the generated flight plan name
     this.routes = routes; // ✅ Store routes array
     this.airfields = airfields; // ✅ Collect airfields from routes
+    this.finalReserveTime = 30; // ✅ Add default final reserve fuel
+    this.captainReserveTime = 30; // ✅ Add default captain reserve fuel
+    this.flightPlanTime = null; // ✅ Store total flight plan time
   }
 
   saveToCache() {
@@ -69,17 +72,19 @@ class FlightPlan {
       return null;
     }
   }
-}
+  // Compute total flight plan time
+  calculateFlightPlanTime() {
+    // 1. Sum of routeTime for all routes
+    const totalRouteTime = this.routes.reduce(
+      (sum, route) => sum + (route.routeTime || 0),
+      0
+    );
 
-class Airfield {
-  constructor(airfieldName, airfieldDesignator, latitude, longitude) {
-    this.airfieldName = airfieldName;
-    this.airfieldDesignator = airfieldDesignator;
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.taxiTime = 5; // Default taxi time of 10 minutes
-    this.departureProcedureTime = 10; // Default departure procedure time of 10 minutes
-    this.arrivalProcedureTime = 10; // Default arrival procedure time of 10 minutes
+    // 2. Add finalReserveTime and CaptainReserveTime
+    this.flightPlanTime =
+      totalRouteTime + this.finalReserveTime + this.captainReserveTime;
+
+    return this.flightPlanTime;
   }
 }
 

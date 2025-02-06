@@ -7,6 +7,7 @@ Surface Altitude
 Minimal Security Altitude
 
 SET 2
+Weather Data
 Pressure Altitude
 Density Altitude
 ISA Deviation
@@ -15,9 +16,9 @@ SET 3
 Drift
 Magnetic Heading
 Magnetic Track
-
-
-SET 4
 Ground Speed
 Leg Time w/o Wind
 Leg Time w/ Wind
+
+SET 4
+Fuel Balance
