@@ -127,6 +127,7 @@ function processWindCorrection() {
 
   // ✅ Now, calculate flight plan time using updated route times
   flightPlan.calculateFlightPlanTime();
+  flightPlan.buildNavigationLog();
 
   Logger.log("Final Flight Plan:");
   Logger.log(JSON.stringify(flightPlan, null, 2));
