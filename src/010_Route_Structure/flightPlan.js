@@ -176,12 +176,7 @@ function constructFlightPlan(routes) {
     }
 
     // Construct the Route object
-    return new Route(
-      departureAirfield,
-      destinationAirfield,
-      route.legs,
-      route.name
-    );
+    return new Route(departureAirfield, destinationAirfield, legs, route.name);
   });
 
   // ✅ Collect airfields once, outside of FlightPlan
