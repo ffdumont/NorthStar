@@ -93,6 +93,14 @@ function dumpFlightPlanData(flightPlan) {
     airfields.set(airfield.airfieldDesignator, airfieldData);
   });
 
+  // ✅ Generate and store Navigation Log
+  let navLog = flightPlan.buildNavigationLog(); // Call the method
+  navigationLog = navLog.map((entry) => ({
+    waypoint: entry.waypoint,
+    remainingTime: entry.remainingTime,
+    comment: entry.comment,
+  }));
+
   // Convert Maps to Arrays for dumping
   let routeArray = Array.from(routes.values());
   let legArray = Array.from(legs.values());
@@ -105,6 +113,7 @@ function dumpFlightPlanData(flightPlan) {
   dumpInstancesToSheets(legArray, "Legs"); // ✅ Includes leg time fields
   dumpInstancesToSheets(waypointArray, "Waypoints");
   dumpInstancesToSheets(airfieldArray, "Airfields");
+  dumpInstancesToSheets(navigationLog, "NavigationLog"); // ✅ Dump Navigation Log
 }
 
 function dumpInstancesToSheets(objects, sheetName) {
