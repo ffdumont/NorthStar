@@ -63,13 +63,13 @@ class Route {
 
     // 2. Sum of TaxiInTime and DepartureProcedureTime for departure airfield
     const departureTime =
-      (this.departureAirfield.TaxiInTime || 0) +
-      (this.departureAirfield.DepartureProcedureTime || 0);
+      (this.departureAirfield.taxiInTime || 0) +
+      (this.departureAirfield.departureProcedureTime || 0);
 
     // 3. Sum of ArrivalProcedureTime and TaxiOutTime for arrival airfield
     const arrivalTime =
-      (this.destinationAirfield.TaxiOutTime || 0) +
-      (this.destinationAirfield.ArrivalProcedureTime || 0);
+      (this.destinationAirfield.taxiOutTime || 0) +
+      (this.destinationAirfield.arrivalProcedureTime || 0);
 
     // 4. Total route time
     this.routeTime = legsTime + departureTime + arrivalTime;

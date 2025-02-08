@@ -1,12 +1,11 @@
 class FlightPlan {
   constructor(routes, name, airfields) {
-    // ✅ Add `name` parameter
-    this.name = name; // ✅ Store the generated flight plan name
-    this.routes = routes; // ✅ Store routes array
-    this.airfields = airfields; // ✅ Collect airfields from routes
-    this.finalReserveTime = 30; // ✅ Add default final reserve fuel
-    this.captainReserveTime = 30; // ✅ Add default captain reserve fuel
-    this.flightPlanTime = null; // ✅ Store total flight plan time
+    this.name = name;
+    this.routes = routes;
+    this.airfields = airfields;
+    this.finalReserveTime = 30; // Example value
+    this.captainReserveTime = 30; // Example value
+    this.flightPlanTime = null; // Store total flight plan time
   }
 
   saveToCache() {
@@ -72,19 +71,93 @@ class FlightPlan {
       return null;
     }
   }
-  // Compute total flight plan time
+
   calculateFlightPlanTime() {
-    // 1. Sum of routeTime for all routes
     const totalRouteTime = this.routes.reduce(
       (sum, route) => sum + (route.routeTime || 0),
       0
     );
-
-    // 2. Add finalReserveTime and CaptainReserveTime
     this.flightPlanTime =
       totalRouteTime + this.finalReserveTime + this.captainReserveTime;
-
     return this.flightPlanTime;
+  }
+
+  buildNavigationLog() {
+    let remainingTime = this.calculateFlightPlanTime();
+    let navLog = [];
+
+    this.routes.forEach((route, routeIndex) => {
+      if (!route.legs || Object.keys(route.legs).length === 0) {
+        Logger.log(
+          `Warning: Skipping route ${route.name} because it has no legs.`
+        );
+        return;
+      }
+
+      // Push departure airfield (unchanged remaining time)
+      if (routeIndex === 0) {
+        navLog.push({
+          waypoint: route.departureAirfield.airfieldDesignator,
+          remainingTime: remainingTime,
+          comment: "Total FlightPlan Time",
+        });
+      }
+
+      // Process all legs directly from the object
+      for (const legNumber in route.legs) {
+        const leg = route.legs[legNumber];
+
+        // First waypoint of the first leg
+        if (parseInt(legNumber) === 1) {
+          remainingTime -=
+            (route.departureAirfield.taxiOutTime || 0) +
+            (route.departureAirfield.departureProcedureTime || 0);
+          navLog.push({
+            waypoint: leg.from.name, // Correctly access first leg's "from" waypoint
+            remainingTime: remainingTime,
+            comment: "TaxiOutTime + DepartureProcedureTime",
+          });
+        }
+
+        remainingTime -= leg.legTimeWithWind || 0;
+        navLog.push({
+          waypoint: leg.to.name,
+          remainingTime: remainingTime,
+          comment: "Leg time",
+        });
+      }
+
+      // Push arrival airfield and subtract TaxiInTime + ArrivalProcedureTime
+      remainingTime -=
+        (route.destinationAirfield.taxiInTime || 0) +
+        (route.destinationAirfield.arrivalProcedureTime || 0);
+      navLog.push({
+        waypoint: route.destinationAirfield.airfieldDesignator,
+        remainingTime: remainingTime,
+        comment: "TaxiInTime + ArrivalProcedureTime",
+      });
+
+      // If it's the last airfield, set remaining time to final reserve time
+      if (routeIndex === this.routes.length - 1) {
+        remainingTime = this.finalReserveTime + this.captainReserveTime;
+        navLog[navLog.length - 1].remainingTime = remainingTime;
+        navLog[navLog.length - 1].comment = "Final reserve time";
+      }
+    });
+
+    return navLog;
+  }
+}
+
+// Test function to recall the current flight plan from the cache and build the navigation log
+function testBuildNavigationLog() {
+  const flightPlan = FlightPlan.loadFromCache();
+
+  if (flightPlan) {
+    const navigationLog = flightPlan.buildNavigationLog();
+    console.log(navigationLog);
+  } else {
+    console.log("No flight plan found in cache.");
   }
 }
 
@@ -104,6 +177,7 @@ function constructFlightPlan(routes) {
       );
     }
 
+    // Create Airfield objects
     // Create Airfield objects
     const departureAirfield = new Airfield(
       firstAirfield.airfieldName,
@@ -145,7 +219,26 @@ function constructFlightPlan(routes) {
   }
 
   const airfields = collectAirfields(constructedRoutes); // ✅ Collect airfields once
+  // ✅ Collect airfields once, outside of FlightPlan
+  function collectAirfields(routes) {
+    const airfieldMap = new Map();
+    routes.forEach((route) => {
+      airfieldMap.set(
+        route.departureAirfield.airfieldDesignator,
+        route.departureAirfield
+      );
+      airfieldMap.set(
+        route.destinationAirfield.airfieldDesignator,
+        route.destinationAirfield
+      );
+    });
+    return Array.from(airfieldMap.values());
+  }
+
+  const airfields = collectAirfields(constructedRoutes); // ✅ Collect airfields once
   const airfieldSequence = constructedRoutes
+    .map((route) => route?.departureAirfield?.airfieldDesignator)
+    .filter(Boolean)
     .map((route) => route?.departureAirfield?.airfieldDesignator)
     .filter(Boolean)
     .concat(
@@ -153,9 +246,13 @@ function constructFlightPlan(routes) {
         "UNKNOWN"
     )
     .join("-");
+    )
+    .join("-");
 
   console.log("Generated FlightPlan Name:", airfieldSequence);
 
+  // ✅ Pass airfields explicitly to FlightPlan constructor
+  return new FlightPlan(constructedRoutes, airfieldSequence, airfields);
   // ✅ Pass airfields explicitly to FlightPlan constructor
   return new FlightPlan(constructedRoutes, airfieldSequence, airfields);
 }
