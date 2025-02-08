@@ -116,10 +116,18 @@ function processWindCorrection() {
       // Calculate wind correction angle
       leg.windCorrectionAngle();
 
+      // Calculate leg times
       leg.calculateLegTimeWithoutWind();
       leg.calculateLegTimeWithWind();
     });
+
+    // ✅ Calculate route time after processing all legs
+    route.calculateRouteTime();
   });
+
+  // ✅ Now, calculate flight plan time using updated route times
+  flightPlan.calculateFlightPlanTime();
+
   Logger.log("Final Flight Plan:");
   Logger.log(JSON.stringify(flightPlan, null, 2));
 
@@ -186,8 +194,13 @@ function loadFlightPlanFromDrive() {
   const file = files.next();
   const jsonString = file.getBlob().getDataAsString();
   Logger.log("Loaded Flight Plan from Drive: " + filename);
+  const flightPlan = loadFlightPlanFromJSON(jsonString);
 
-  return loadFlightPlanFromJSON(jsonString); // Convert JSON to FlightPlan object
+  if (flightPlan) {
+    flightPlan.saveToCache(); // ✅ Save to cache
+  }
+
+  return flightPlan;
 }
 function loadFlightPlanFromJSON(jsonString) {
   try {

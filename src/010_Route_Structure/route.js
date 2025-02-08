@@ -4,31 +4,7 @@ class Route {
     this.departureAirfield = departureAirfield; // Airfield object
     this.destinationAirfield = destinationAirfield; // Airfield object
     this.legs = legs; // Array of Leg objects
-  }
-
-  getWaypointsFromSheet() {
-    const sheet =
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Waypoints");
-    if (!sheet) {
-      Logger.log("Sheet 'Waypoints' not found.");
-      return;
-    }
-    const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 3).getValues();
-
-    const waypoints = {};
-
-    data.forEach((row) => {
-      const [name, lat, lon] = row;
-      if (name && !isNaN(lat) && !isNaN(lon)) {
-        const waypoint = new Waypoint(name.trim().toUpperCase(), lat, lon);
-        waypoints[waypoint.name] = waypoint;
-        Logger.log(waypoint.toString());
-      } else {
-        Logger.log(`Invalid data for waypoint: ${row}`);
-      }
-    });
-
-    this.waypoints = waypoints;
+    this.routeTime = null; // Total time for the route
   }
 
   fetchRouteWeatherData() {
@@ -72,5 +48,32 @@ class Route {
       }
     }
     Logger.log("Weather data fetch completed for all legs.");
+  }
+
+  // Compute total route time
+  calculateRouteTime() {
+    // ✅ Convert legs object to an array before summing
+    const legsArray = Object.values(this.legs);
+
+    // 1. Sum of maxLegTime for all legs
+    const legsTime = legsArray.reduce(
+      (sum, leg) => sum + leg.getLegMaxTime(),
+      0
+    );
+
+    // 2. Sum of TaxiInTime and DepartureProcedureTime for departure airfield
+    const departureTime =
+      (this.departureAirfield.TaxiInTime || 0) +
+      (this.departureAirfield.DepartureProcedureTime || 0);
+
+    // 3. Sum of ArrivalProcedureTime and TaxiOutTime for arrival airfield
+    const arrivalTime =
+      (this.destinationAirfield.TaxiOutTime || 0) +
+      (this.destinationAirfield.ArrivalProcedureTime || 0);
+
+    // 4. Total route time
+    this.routeTime = legsTime + departureTime + arrivalTime;
+
+    return this.routeTime;
   }
 }

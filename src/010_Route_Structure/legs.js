@@ -20,5 +20,7 @@ class Leg {
     this.legTimeWithWind = null;
     this.midPoint = null;
     this.elevation = null;
+
+    this.legDelayTime = 0;
   }
 }

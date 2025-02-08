@@ -1,8 +1,12 @@
 class FlightPlan {
-  constructor(routes, name) {
+  constructor(routes, name, airfields) {
     // ✅ Add `name` parameter
     this.name = name; // ✅ Store the generated flight plan name
     this.routes = routes; // ✅ Store routes array
+    this.airfields = airfields; // ✅ Collect airfields from routes
+    this.finalReserveTime = 30; // ✅ Add default final reserve fuel
+    this.captainReserveTime = 30; // ✅ Add default captain reserve fuel
+    this.flightPlanTime = null; // ✅ Store total flight plan time
   }
 
   saveToCache() {
@@ -68,20 +72,24 @@ class FlightPlan {
       return null;
     }
   }
-}
+  // Compute total flight plan time
+  calculateFlightPlanTime() {
+    // 1. Sum of routeTime for all routes
+    const totalRouteTime = this.routes.reduce(
+      (sum, route) => sum + (route.routeTime || 0),
+      0
+    );
 
-class Airfield {
-  constructor(airfieldName, airfieldDesignator, latitude, longitude) {
-    this.airfieldName = airfieldName;
-    this.airfieldDesignator = airfieldDesignator;
-    this.latitude = latitude;
-    this.longitude = longitude;
+    // 2. Add finalReserveTime and CaptainReserveTime
+    this.flightPlanTime =
+      totalRouteTime + this.finalReserveTime + this.captainReserveTime;
+
+    return this.flightPlanTime;
   }
 }
 
 function constructFlightPlan(routes) {
   const constructedRoutes = routes.map((route) => {
-    // Extract first and last airfield waypoints for the route
     const firstAirfield = route.waypoints[0]; // First waypoint (always airfield)
     const lastAirfield = route.waypoints[route.waypoints.length - 1]; // Last waypoint (always airfield)
 
@@ -96,7 +104,7 @@ function constructFlightPlan(routes) {
       );
     }
 
-    // Create Airfield objects for departure and destination
+    // Create Airfield objects
     const departureAirfield = new Airfield(
       firstAirfield.airfieldName,
       firstAirfield.airfieldDesignator,
@@ -168,20 +176,42 @@ function constructFlightPlan(routes) {
     }
 
     // Construct the Route object
-    return new Route(departureAirfield, destinationAirfield, legs, route.name);
+    return new Route(
+      departureAirfield,
+      destinationAirfield,
+      route.legs,
+      route.name
+    );
   });
 
+  // ✅ Collect airfields once, outside of FlightPlan
+  function collectAirfields(routes) {
+    const airfieldMap = new Map();
+    routes.forEach((route) => {
+      airfieldMap.set(
+        route.departureAirfield.airfieldDesignator,
+        route.departureAirfield
+      );
+      airfieldMap.set(
+        route.destinationAirfield.airfieldDesignator,
+        route.destinationAirfield
+      );
+    });
+    return Array.from(airfieldMap.values());
+  }
+
+  const airfields = collectAirfields(constructedRoutes); // ✅ Collect airfields once
   const airfieldSequence = constructedRoutes
-    .map((route) => route?.departureAirfield?.airfieldDesignator) // ✅ Correct property
-    .filter(Boolean) // Remove undefined values
+    .map((route) => route?.departureAirfield?.airfieldDesignator)
+    .filter(Boolean)
     .concat(
       constructedRoutes.slice(-1)[0]?.destinationAirfield?.airfieldDesignator ||
         "UNKNOWN"
-    ) // ✅ Correct property, safe fallback
-    .join("-"); // Join with hyphens
+    )
+    .join("-");
 
   console.log("Generated FlightPlan Name:", airfieldSequence);
 
-  // Construct the FlightPlan object with the generated name
-  return new FlightPlan(constructedRoutes, airfieldSequence);
+  // ✅ Pass airfields explicitly to FlightPlan constructor
+  return new FlightPlan(constructedRoutes, airfieldSequence, airfields);
 }
