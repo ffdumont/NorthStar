@@ -85,10 +85,10 @@ function dumpFlightPlanData(flightPlan) {
     });
 
     // ✅ Include relevant time-related properties
-    airfieldData.taxiOutTime = airfield.TaxiOutTime || 0;
-    airfieldData.departureProcedureTime = airfield.DepartureProcedureTime || 0;
-    airfieldData.taxiInTime = airfield.TaxiInTime || 0;
-    airfieldData.arrivalProcedureTime = airfield.ArrivalProcedureTime || 0;
+    airfieldData.taxiOutTime = airfield.taxiOutTime || 0;
+    airfieldData.departureProcedureTime = airfield.departureProcedureTime || 0;
+    airfieldData.taxiInTime = airfield.taxiInTime || 0;
+    airfieldData.arrivalProcedureTime = airfield.arrivalProcedureTime || 0;
 
     airfields.set(airfield.airfieldDesignator, airfieldData);
   });
